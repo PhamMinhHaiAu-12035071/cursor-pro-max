@@ -48,10 +48,10 @@ Khi command được gọi, AI sẽ thực hiện 5 bước sau:
 ### Bước 1: Đọc Grammar Learning Skill
 
 AI sẽ tự động đọc và áp dụng các quy tắc từ:
-- `@.cursor/skills/grammar-learning/SKILL.md` - Workflow chính
-- `@.cursor/skills/grammar-learning/references/grammar-rules.md` - Chi tiết quy tắc ngữ pháp
-- `@.cursor/skills/grammar-learning/references/common-mistakes-vn.md` - Lỗi phổ biến của người Việt
-- `@.cursor/skills/grammar-learning/references/vietnamese-writing-style.md` - Cách viết tiếng Việt tự nhiên
+- `@.claude/skills/grammar-learning/SKILL.md` - Workflow chính
+- `@.claude/skills/grammar-learning/references/grammar-rules.md` - Chi tiết quy tắc ngữ pháp
+- `@.claude/skills/grammar-learning/references/common-mistakes-vn.md` - Lỗi phổ biến của người Việt
+- `@.claude/skills/grammar-learning/references/vietnamese-writing-style.md` - Cách viết tiếng Việt tự nhiên
 
 ### Bước 2: Phân Tích Input
 

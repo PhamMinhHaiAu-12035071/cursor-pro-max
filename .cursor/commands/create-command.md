@@ -862,6 +862,14 @@ The templates in this command can be customized by editing this file directly. T
 3. Update validation rules in Phase 5 if needed
 4. Test by generating a command with the new template
 
+## Related Skills
+
+- **`lyra-prompt-optimizer`** - Optimize generated command prompts
+  - Use after `/create-command` to enhance command quality and effectiveness
+  - Applies cognitive prompt architecture (4-phase methodology)
+  - Supports 3 optimization levels for different needs
+  - Example: After generating a command, optimize its instructions for better AI execution
+
 ---
 
 **Created by**: `/create-command` meta-command generator

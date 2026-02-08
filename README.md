@@ -4,6 +4,8 @@
 
 **cursor-pro-max** là một meta-project tập hợp best practices từ "Vibe Coding Cursor" - bao gồm commands, rules, skills và agents. Đây không phải là một ứng dụng code mà là một knowledge base và toolkit để tối ưu workflow với Cursor IDE.
 
+> **📌 Migration Note (Feb 2026):** Skills have been moved from `.cursor/skills/` to `.claude/skills/` for better Claude Code (claude.ai/code) compatibility and multi-IDE support. All three skill directories (`.cursor/skills/`, `.claude/skills/`, `.codex/skills/`) are equally supported by Cursor.
+
 ## Về Project
 
 Project này được thiết kế để:
@@ -72,6 +74,15 @@ Skills là các AI capabilities tự động activate khi match triggers:
   - References: grammar rules, common mistakes, writing style
   - Examples: sample corrections
 
+- **`lyra-prompt-optimizer`**
+  - AI prompt optimization và engineering
+  - 4 advanced reasoning frameworks (CoT, ToT, GoT, AoT)
+  - 3 optimization levels (Quick Boost, Deep Dive, Revolutionary)
+  - Bilingual support (Vietnamese-English)
+  - Platform-specific optimization (Claude, ChatGPT, Gemini)
+  - References: reasoning frameworks, optimization toolkit, anti-patterns
+  - Examples: 12 comprehensive examples across all levels
+
 ### Rules System
 
 Rules system được document đầy đủ trong `.cursor/commands/create-rule.md` nhưng chưa có rules nào được implement. Bạn có thể tạo rules để apply coding standards tự động khi mở files.
@@ -86,9 +97,274 @@ Rules system được document đầy đủ trong `.cursor/commands/create-rule.
 
 ## Cài Đặt
 
-### Template-based Installation
+### 🎯 Installation Script (Recommended)
 
-Sử dụng cursor-pro-max như template cho Cursor projects của bạn:
+cursor-pro-max cung cấp `install.sh` - một installation script tự động với conflict resolution thông minh.
+
+#### Quick Start
+
+**Greenfield Project (Empty directory):**
+
+```bash
+# Clone project
+git clone https://github.com/[username]/cursor-pro-max.git
+
+# Navigate to your project
+cd /path/to/your-project
+
+# Run installer
+/path/to/cursor-pro-max/install.sh
+
+# Restart Cursor IDE
+```
+
+**Brownfield Project (Existing .cursor/):**
+
+```bash
+# Same as above - script will detect conflicts
+cd /path/to/existing-project
+
+/path/to/cursor-pro-max/install.sh
+# You'll be prompted for each conflict group
+```
+
+#### Installation Script Features
+
+- ✅ **Smart Conflict Detection**: Detects existing files và prompts for resolution
+- 🔄 **Update Mode**: Only updates changed files (checksums comparison)
+- 🗑️ **Clean Uninstall**: Safely removes all installed components
+- 📊 **Post-Install Validation**: Verifies installation completeness
+- 🎨 **Colored Output**: Beautiful terminal output với emojis
+- 🚫 **Error Handling**: Comprehensive error messages và troubleshooting hints
+
+#### Usage Modes
+
+##### 1️⃣ Install Mode (Default)
+
+Installs cursor-pro-max vào target directory với interactive conflict resolution.
+
+```bash
+# Install in current directory
+./install.sh
+
+# Install in specific directory
+./install.sh /path/to/project
+```
+
+**What Gets Installed:**
+- `.cursor/commands/` - 6 slash commands
+- `.claude/skills/grammar-learning/` - Grammar skill với references
+- `GLOBAL_RULE.md` - System prompt (~5,600 lines)
+
+**Conflict Resolution:**
+
+Khi files tồn tại, bạn sẽ được hỏi theo nhóm:
+
+```
+⚠️  5 command files already exist in .cursor/commands/
+   - check-grammar.md
+   - council.md
+   - create-command.md
+   - create-rule.md
+   - interview.md
+
+Overwrite all commands? (y/n) [n]:
+```
+
+**Grouped prompts** giảm prompt fatigue:
+- Commands group → 1 prompt cho tất cả commands
+- Skills group → 1 prompt cho tất cả skills
+- GLOBAL_RULE.md → 1 prompt riêng
+
+##### 2️⃣ Update Mode
+
+Updates existing installation - chỉ process changed files.
+
+```bash
+./install.sh --update
+```
+
+**Smart Update:**
+- ✅ Detects changes using checksums (SHA-256/MD5)
+- ✅ Skips identical files
+- ✅ Prompts individually for each changed file
+- ✅ Shows summary: updated vs skipped
+
+**Example output:**
+
+```
+Found 3 change(s)
+
+📝 Modified: check-grammar.md
+  Update this file? (Y/n): y
+  ✅ Updated
+
+📝 Modified: GLOBAL_RULE.md
+  Update this file? (Y/n): y
+  ✅ Updated
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Update Summary:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Updated: 2 file(s)
+⏭️  Skipped: 0 file(s)
+```
+
+##### 3️⃣ Uninstall Mode
+
+Safely removes cursor-pro-max from project.
+
+```bash
+./install.sh --uninstall
+```
+
+**Safety Features:**
+- Shows what will be deleted
+- **Double confirmation** required
+- Clear summary of removed items
+
+**Example:**
+
+```
+⚠️  This will PERMANENTLY DELETE the following:
+   - .cursor/ directory (commands and skills)
+   - GLOBAL_RULE.md
+
+⚠️  This action cannot be undone!
+
+Are you sure you want to uninstall? (y/N): y
+Really delete? (final confirmation) (y/N): y
+
+✅ Removed .cursor/ directory
+✅ Removed GLOBAL_RULE.md
+
+🎉 Uninstall completed successfully!
+```
+
+#### Help and Version
+
+```bash
+# Show help with examples
+./install.sh --help
+
+# Show version
+./install.sh --version
+```
+
+#### Prerequisites
+
+Installation script requires (usually pre-installed on macOS/Linux):
+
+| Tool | Purpose | Check |
+|------|---------|-------|
+| `bash` | Shell (3.2+) | `bash --version` |
+| `cp` | Copy files | `which cp` |
+| `mv` | Move files | `which mv` |
+| `rm` | Remove files | `which rm` |
+| `find` | Find files | `which find` |
+
+Script tự động validates prerequisites trước khi chạy.
+
+#### Troubleshooting
+
+**Permission Denied:**
+
+```bash
+chmod +x install.sh
+./install.sh
+```
+
+**Installation Incomplete:**
+
+- Check file permissions in target directory
+- Ensure you have write access
+- Verify disk space available
+
+**Validation Failed:**
+
+```bash
+# Make sure you're running from cursor-pro-max directory
+cd /path/to/cursor-pro-max
+./install.sh
+```
+
+**Wrong Directory Structure:**
+
+Script expects:
+```
+cursor-pro-max/
+├── install.sh
+├── .cursor/
+│   ├── commands/
+│   └── skills/
+└── GLOBAL_RULE.md
+```
+
+If structure is incorrect, validation will fail with clear error messages.
+
+#### Advanced Usage
+
+**Disable Colors:**
+
+```bash
+NO_COLOR=1 ./install.sh
+```
+
+**Install from Different Location:**
+
+```bash
+# Run script from anywhere
+/absolute/path/to/cursor-pro-max/install.sh /target/project
+```
+
+**Scripted Installation (Non-interactive):**
+
+```bash
+# Auto-accept all prompts (use with caution!)
+yes | ./install.sh
+
+# Or pipe specific answers
+printf "y\nn\ny\n" | ./install.sh  # yes, no, yes
+```
+
+#### Exit Codes
+
+| Code | Meaning | Action |
+|------|---------|--------|
+| `0` | Success | Installation completed |
+| `1` | General error | Check error message |
+| `2` | Invalid arguments | Run `--help` |
+| `3` | Prerequisites not met | Install missing tools |
+| `126` | Permission denied | Run `chmod +x` |
+| `130` | User interrupted (Ctrl+C) | Re-run if needed |
+
+#### Post-Installation
+
+**IMPORTANT:** Restart Cursor IDE để load commands và rules!
+
+Sau khi restart:
+- Commands available ngay: gõ `/` để xem list
+- Skills auto-activate khi match triggers
+- GLOBAL_RULE.md được AI đọc và follow
+
+**Verify Installation:**
+
+```bash
+# Check installed files
+ls -la .cursor/commands/
+ls -la .cursor/skills/
+ls -la GLOBAL_RULE.md
+
+# Count commands (should be 6)
+find .cursor/commands -name "*.md" | wc -l
+
+# Check GLOBAL_RULE.md size
+wc -l GLOBAL_RULE.md  # Should be ~5,600 lines
+```
+
+### Template-based Installation (Manual)
+
+Nếu không muốn dùng `install.sh`, bạn có thể copy manually:
 
 ```bash
 # Clone project
@@ -354,7 +630,7 @@ Không chỉ sửa lỗi mà còn DẠY ngữ pháp qua việc giải thích T�
 
 **Structure:**
 ```
-.cursor/skills/grammar-learning/
+.claude/skills/grammar-learning/
 ├── SKILL.md                           # Main skill definition
 ├── references/                        # Knowledge base
 │   ├── grammar-rules.md               # 9 grammar categories
@@ -382,7 +658,7 @@ Không chỉ sửa lỗi mà còn DẠY ngữ pháp qua việc giải thích T�
 - Cultural context (tại sao người Việt hay mắc lỗi này)
 - Pattern detection (3+ lỗi giống nhau)
 
-**Chi tiết:** Xem `.cursor/skills/grammar-learning/SKILL.md`
+**Chi tiết:** Xem `.claude/skills/grammar-learning/SKILL.md`
 
 ## Rules System
 
@@ -469,18 +745,34 @@ cursor-pro-max/
 │   │   ├── interview.md             # Requirements gathering (1,074 dòng)
 │   │   └── phase-plan.md            # Phased work (11 dòng)
 │   │
-│   ├── skills/                      # AI Skills (YAML + references + examples)
-│   │   └── grammar-learning/
-│   │       ├── SKILL.md             # Main skill definition (186 dòng)
-│   │       ├── references/          # Knowledge base
-│   │       │   ├── grammar-rules.md            # 9 categories (454 dòng)
-│   │       │   ├── common-mistakes-vn.md       # 10 common errors
-│   │       │   └── vietnamese-writing-style.md # Writing guidelines (232 dòng)
-│   │       └── examples/
-│   │           └── sample-corrections.md       # 4 example scenarios
-│   │
 │   └── rules/                       # [Chưa tạo] Cursor rules (.mdc files)
 │       └── (empty - chưa có rules)
+│
+├── .claude/
+│   └── skills/                      # AI Skills (YAML + references + examples)
+│       ├── grammar-learning/
+│       │   ├── SKILL.md             # Main skill definition (186 dòng)
+│       │   ├── references/          # Knowledge base
+│       │   │   ├── grammar-rules.md            # 9 categories (454 dòng)
+│       │   │   ├── common-mistakes-vn.md       # 10 common errors
+│       │   │   └── vietnamese-writing-style.md # Writing guidelines (232 dòng)
+│       │   └── examples/
+│       │       └── sample-corrections.md       # 4 example scenarios
+│       └── lyra-prompt-optimizer/
+│           ├── SKILL.md             # Prompt optimization skill (380 dòng)
+│           ├── references/          # Core documentation
+│           │   ├── reasoning-frameworks.md     # CoT, ToT, GoT, AoT (512 dòng)
+│           │   ├── optimization-toolkit.md     # Techniques catalog (618 dòng)
+│           │   ├── core-concepts.md            # 4D methodology (432 dòng)
+│           │   ├── vietnamese-guide.md         # Bilingual support (341 dòng)
+│           │   └── anti-patterns.md            # Common mistakes (441 dòng)
+│           ├── examples/
+│           │   ├── quick-boost/     # Basic optimization (3 examples)
+│           │   ├── deep-dive/       # Advanced optimization (4 examples)
+│           │   ├── revolutionary/   # Maximum optimization (3 examples)
+│           │   └── vietnamese/      # Vietnamese examples (2 examples)
+│           └── scripts/
+│               └── quality-check.sh # Validation script
 │
 ├── GLOBAL_RULE.md                   # System prompt (5,600 dòng, v2.0.0)
 ├── CLAUDE.md                        # Project documentation
@@ -493,7 +785,7 @@ cursor-pro-max/
 | Aspect | Commands | Skills | Rules |
 |--------|----------|--------|-------|
 | **File Extension** | `.md` | `SKILL.md` | `.mdc` |
-| **Location** | `.cursor/commands/` | `.cursor/skills/<name>/` | `.cursor/rules/` |
+| **Location** | `.cursor/commands/` | `.claude/skills/<name>/` | `.cursor/rules/` |
 | **YAML Frontmatter** | ❌ Không cần | ✅ Required | ✅ Required |
 | **Activation** | Manual (`/command`) | Auto (via description triggers) | Auto (glob pattern matching) |
 | **Purpose** | Workflow/Action | Domain knowledge/capability | Standards/Patterns |
@@ -523,7 +815,7 @@ Output trả về user
 ```
 User input matches skill description
    ↓
-Cursor loads .cursor/skills/<skill>/SKILL.md + references
+Cursor loads .claude/skills/<skill>/SKILL.md + references
    ↓
 AI applies skill knowledge
    ↓
@@ -598,7 +890,7 @@ AI sẽ interview bạn và generate command từ template.
 
 1. Tạo directory:
    ```bash
-   mkdir -p .cursor/skills/<skill-name>
+   mkdir -p .claude/skills/<skill-name>
    ```
 
 2. Tạo `SKILL.md` với YAML frontmatter:
@@ -613,8 +905,8 @@ AI sẽ interview bạn và generate command từ template.
 
 3. (Optional) Thêm references và examples:
    ```bash
-   mkdir -p .cursor/skills/<skill-name>/references
-   mkdir -p .cursor/skills/<skill-name>/examples
+   mkdir -p .claude/skills/<skill-name>/references
+   mkdir -p .claude/skills/<skill-name>/examples
    ```
 
 4. Test skill bằng cách trigger description

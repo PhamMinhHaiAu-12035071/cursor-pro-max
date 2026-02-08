@@ -6,22 +6,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **cursor-pro-max** là một meta-project tập hợp best practices từ "Vibe Coding Cursor" - bao gồm commands, rules, skills và agents. Đây không phải là một ứng dụng code mà là một knowledge base và toolkit để tối ưu workflow với Cursor IDE.
 
+### Migration History
+
+**February 2026**: Skills moved from `.cursor/skills/` to `.claude/skills/` for improved Claude Code (claude.ai/code) compatibility and multi-IDE support. This aligns with the Claude ecosystem conventions as documented in [Cursor Skills Documentation](https://cursor.com/docs/context/skills).
+
 ## Project Structure
 
 ```
 .cursor/
-├── commands/           # Cursor slash commands (plain .md files)
-│   ├── interview.md    # Phỏng vấn thu thập requirements
-│   ├── phase-plan.md   # Tổ chức công việc theo phases
-│   ├── council.md      # Multi-agent coordination
-│   ├── create-rule.md  # Hướng dẫn tạo Cursor rules
-│   ├── create-command.md # Meta-command generator
-│   └── check-grammar.md  # Grammar checking
+└── commands/           # Cursor slash commands (plain .md files)
+    ├── interview.md    # Phỏng vấn thu thập requirements
+    ├── phase-plan.md   # Tổ chức công việc theo phases
+    ├── council.md      # Multi-agent coordination
+    ├── create-rule.md  # Hướng dẫn tạo Cursor rules
+    ├── create-command.md # Meta-command generator
+    └── check-grammar.md  # Grammar checking
+
+.claude/
 └── skills/             # AI Skills với YAML frontmatter
-    └── grammar-learning/ # Grammar correction skill
+    ├── grammar-learning/ # Grammar correction skill
+    │   ├── SKILL.md
+    │   ├── references/
+    │   └── examples/
+    └── lyra-prompt-optimizer/ # AI prompt optimization skill
         ├── SKILL.md
         ├── references/
-        └── examples/
+        ├── examples/
+        └── scripts/
 
 GLOBAL_RULE.md          # System prompt chính (~5600 lines) cho AI agents
 ```
@@ -56,7 +67,7 @@ GLOBAL_RULE.md          # System prompt chính (~5600 lines) cho AI agents
 Create `.cursor/commands/<command-name>.md` với plain markdown describing the command's purpose and workflow.
 
 ### Add new skill
-Create `.cursor/skills/<skill-name>/SKILL.md` với YAML frontmatter:
+Create `.claude/skills/<skill-name>/SKILL.md` với YAML frontmatter:
 ```yaml
 ---
 name: skill-name
