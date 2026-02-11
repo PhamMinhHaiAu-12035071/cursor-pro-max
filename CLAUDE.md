@@ -24,15 +24,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 .claude/
 └── skills/             # AI Skills với YAML frontmatter
-    ├── grammar-learning/ # Grammar correction skill
+    ├── claudeception/          # Continuous learning & skill extraction
+    │   ├── SKILL.md
+    │   ├── references/
+    │   ├── examples/
+    │   └── scripts/
+    ├── grammar-learning/       # Grammar correction skill
     │   ├── SKILL.md
     │   ├── references/
     │   └── examples/
-    └── lyra-prompt-optimizer/ # AI prompt optimization skill
+    ├── humanizer/              # Remove AI writing patterns
+    │   ├── SKILL.md
+    │   ├── references/
+    │   └── examples/
+    ├── lyra-prompt-optimizer/  # AI prompt optimization skill
+    │   ├── SKILL.md
+    │   ├── references/
+    │   ├── examples/
+    │   └── scripts/
+    ├── matrix-test-suite/      # Matrix-based test case generation
+    │   ├── SKILL.md
+    │   ├── references/
+    │   ├── examples/
+    │   ├── scripts/
+    │   └── templates/
+    └── uat-test-suite/         # User Acceptance Testing documentation
         ├── SKILL.md
         ├── references/
         ├── examples/
-        └── scripts/
+        ├── scripts/
+        └── templates/
 
 GLOBAL_RULE.md          # System prompt chính (~5600 lines) cho AI agents
 ```
@@ -54,7 +75,7 @@ GLOBAL_RULE.md          # System prompt chính (~5600 lines) cho AI agents
 
 ### File Conventions
 - **Commands** (`.cursor/commands/`): Plain markdown files, no YAML frontmatter
-- **Skills** (`.cursor/skills/`): SKILL.md with YAML frontmatter (name, description)
+- **Skills** (`.claude/skills/`): SKILL.md with YAML frontmatter (name, description)
 - **Rules** (`.cursor/rules/`): `.mdc` files with YAML frontmatter (title, description, globs, alwaysApply)
 
 ## No Build System

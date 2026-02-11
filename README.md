@@ -63,9 +63,15 @@ Commands là các workflow có thể gọi bằng `/command-name`:
   - Educational guide với examples
   - Phân biệt Commands vs Rules
 
-### Skills System
+### Skills System (6 skills)
 
 Skills là các AI capabilities tự động activate khi match triggers:
+
+- **`claudeception`**
+  - Continuous learning system, extracts reusable knowledge from work sessions
+  - Auto-creates new skills from debugging sessions và trial-and-error discovery
+  - Triggers: `/claudeception`, "save this as a skill", "what did we learn?"
+  - Includes 3 example skills (Next.js debugging, Prisma connection pool, TS circular deps)
 
 - **`grammar-learning`**
   - Grammar correction với Vietnamese explanations
@@ -73,6 +79,12 @@ Skills là các AI capabilities tự động activate khi match triggers:
   - Pattern detection cho lỗi phổ biến của người Việt
   - References: grammar rules, common mistakes, writing style
   - Examples: sample corrections
+
+- **`humanizer`**
+  - Remove AI writing patterns, make text sound natural and human-written
+  - 24 documented AI writing patterns based on Wikipedia's "Signs of AI writing"
+  - Triggers: "humanize this text", "make this less robotic", "remove AI patterns"
+  - References: AI writing patterns, personality injection guide
 
 - **`lyra-prompt-optimizer`**
   - AI prompt optimization và engineering
@@ -82,6 +94,20 @@ Skills là các AI capabilities tự động activate khi match triggers:
   - Platform-specific optimization (Claude, ChatGPT, Gemini)
   - References: reasoning frameworks, optimization toolkit, anti-patterns
   - Examples: 12 comprehensive examples across all levels
+
+- **`matrix-test-suite`**
+  - Matrix-based test case generation with mathematical coverage proof
+  - Pairwise testing, boundary value analysis, decision table testing
+  - Produces 3 files: MATRIX (test space model), TESTCASES (detailed cases), COVERAGE-REPORT
+  - Triggers: "generate test matrix", "pairwise testing", "how many test cases do I need"
+  - References: combinatorics cheatsheet, coverage calculation guide, matrix shapes
+
+- **`uat-test-suite`**
+  - User Acceptance Testing documentation generator
+  - Full traceability, priority classification, coverage gap analysis
+  - Produces single UAT-{ProjectName}.md with 10-column format test cases
+  - Triggers: "UAT", "user acceptance testing", "test plan", "acceptance criteria"
+  - References: industry standards, priority classification, UAT best practices
 
 ### Rules System
 
@@ -153,7 +179,7 @@ Installs cursor-pro-max vào target directory với interactive conflict resolut
 
 **What Gets Installed:**
 - `.cursor/commands/` - 6 slash commands
-- `.claude/skills/grammar-learning/` - Grammar skill với references
+- `.claude/skills/` - 6 AI skills (claudeception, grammar-learning, humanizer, lyra-prompt-optimizer, matrix-test-suite, uat-test-suite)
 - `GLOBAL_RULE.md` - System prompt (~5,600 lines)
 
 **Conflict Resolution:**
@@ -227,7 +253,8 @@ Safely removes cursor-pro-max from project.
 
 ```
 ⚠️  This will PERMANENTLY DELETE the following:
-   - .cursor/ directory (commands and skills)
+   - .cursor/ directory (commands)
+   - .claude/ directory (skills)
    - GLOBAL_RULE.md
 
 ⚠️  This action cannot be undone!
@@ -236,6 +263,7 @@ Are you sure you want to uninstall? (y/N): y
 Really delete? (final confirmation) (y/N): y
 
 ✅ Removed .cursor/ directory
+✅ Removed .claude/ directory
 ✅ Removed GLOBAL_RULE.md
 
 🎉 Uninstall completed successfully!
@@ -295,7 +323,8 @@ Script expects:
 cursor-pro-max/
 ├── install.sh
 ├── .cursor/
-│   ├── commands/
+│   └── commands/
+├── .claude/
 │   └── skills/
 └── GLOBAL_RULE.md
 ```
@@ -352,11 +381,14 @@ Sau khi restart:
 ```bash
 # Check installed files
 ls -la .cursor/commands/
-ls -la .cursor/skills/
+ls -la .claude/skills/
 ls -la GLOBAL_RULE.md
 
 # Count commands (should be 6)
 find .cursor/commands -name "*.md" | wc -l
+
+# Count skills (should be 6)
+ls -d .claude/skills/*/ | wc -l
 
 # Check GLOBAL_RULE.md size
 wc -l GLOBAL_RULE.md  # Should be ~5,600 lines
@@ -612,6 +644,43 @@ Educational guide để học cách tạo Cursor rules.
 
 ## Skills Chi Tiết
 
+### claudeception
+
+Continuous learning system tự động extract reusable knowledge từ work sessions.
+
+**Activation Triggers:**
+- `/claudeception` command
+- "save this as a skill" hoặc "extract a skill from this"
+- "what did we learn?"
+- After any task involving non-obvious debugging, workarounds, or trial-and-error discovery
+
+**Purpose:**
+Tự động nhận diện valuable patterns từ debugging sessions và tạo new skills để reuse. Giúp team không phải giải quyết cùng một vấn đề hai lần.
+
+**Structure:**
+```
+.claude/skills/claudeception/
+├── SKILL.md                           # Main skill definition
+├── references/
+│   ├── research-references.md         # Research sources
+│   └── skill-template.md             # Template for new skills
+├── examples/                          # 3 extracted example skills
+│   ├── nextjs-server-side-error-debugging/
+│   ├── prisma-connection-pool-exhaustion/
+│   └── typescript-circular-dependency/
+└── scripts/
+    └── claudeception-activator.sh
+```
+
+**Included Example Skills:**
+1. Next.js Server-Side Error Debugging
+2. Prisma Connection Pool Exhaustion (serverless)
+3. TypeScript Circular Dependency Resolution
+
+**Chi tiết:** Xem `.claude/skills/claudeception/SKILL.md`
+
+---
+
 ### grammar-learning
 
 Grammar correction skill với Vietnamese explanations, được thiết kế đặc biệt cho Vietnamese English learners.
@@ -659,6 +728,131 @@ Không chỉ sửa lỗi mà còn DẠY ngữ pháp qua việc giải thích T�
 - Pattern detection (3+ lỗi giống nhau)
 
 **Chi tiết:** Xem `.claude/skills/grammar-learning/SKILL.md`
+
+---
+
+### humanizer
+
+Remove AI writing patterns để text sound natural và human-written.
+
+**Activation Triggers:**
+- "humanize this text"
+- "make this sound more human"
+- "remove AI patterns"
+- "fix AI writing" / "this sounds like AI"
+- "make this less robotic" / "make it less ChatGPT"
+- "de-AI this" / "rewrite to sound natural"
+
+**Purpose:**
+Nhận diện và loại bỏ 24 AI writing patterns dựa trên Wikipedia's "Signs of AI writing" guide. Không chỉ clean patterns mà còn inject genuine personality.
+
+**Structure:**
+```
+.claude/skills/humanizer/
+├── SKILL.md                           # Main skill definition
+├── references/
+│   ├── ai-writing-patterns.md         # 24 documented patterns
+│   ├── personality-and-soul.md        # Personality injection guide
+│   └── wikipedia-source-guide.md      # Source reference
+└── examples/
+    ├── full-humanization.md           # Complete rewrite example
+    └── quick-fixes.md                 # Quick pattern fixes
+```
+
+**Chi tiết:** Xem `.claude/skills/humanizer/SKILL.md`
+
+---
+
+### lyra-prompt-optimizer
+
+(Đã document ở section Skills System phía trên)
+
+**Chi tiết:** Xem `.claude/skills/lyra-prompt-optimizer/SKILL.md`
+
+---
+
+### matrix-test-suite
+
+Matrix-based test case generation với mathematical coverage proof. Biến requirements thành structured test spaces và derive test cases đảm bảo complete coverage.
+
+**Activation Triggers:**
+- "generate test matrix" / "create matrix test cases"
+- "build test coverage matrix" / "ma tran test"
+- "pairwise testing" / "boundary value analysis"
+- "test all combinations" / "how many test cases do I need"
+- "full coverage test suite" / "decision table testing"
+- "state transition testing"
+- Provide specs/requirements cần systematic test case generation
+
+**Purpose:**
+Transform specifications thành optimized test suites với mathematical proof of coverage completeness. Phù hợp cho regulatory, audit, quality gate requirements.
+
+**Structure:**
+```
+.claude/skills/matrix-test-suite/
+├── SKILL.md                           # Main skill definition
+├── references/
+│   ├── combinatorics-cheatsheet.md    # Math foundations
+│   ├── coverage-calculation-guide.md  # Coverage metrics
+│   └── matrix-shapes-library.md       # Matrix patterns
+├── examples/
+│   ├── large-ecommerce-checkout.md    # Complex example
+│   └── small-hotpot-pricing.md        # Simple example
+├── scripts/
+│   └── validate-matrix.js            # Validation script
+└── templates/                         # Output templates
+    ├── matrix-output-template.md
+    ├── testcases-output-template.md
+    └── coverage-report-template.md
+```
+
+**Output Files (3 files):**
+1. **MATRIX** - Test space model (variables, dimensions, constraints)
+2. **TESTCASES** - Detailed test cases with expected results
+3. **COVERAGE-REPORT** - Audit-grade traceability with mathematical proof
+
+**Chi tiết:** Xem `.claude/skills/matrix-test-suite/SKILL.md`
+
+---
+
+### uat-test-suite
+
+User Acceptance Testing documentation generator với full traceability và coverage gap analysis.
+
+**Activation Triggers:**
+- "UAT" / "user acceptance testing"
+- "test suite" / "test plan"
+- "acceptance criteria" / "QA checklist"
+- "test cases" / "test scenarios"
+- Provide system requirements cần validation documentation
+
+**Purpose:**
+Generate production-ready UAT documentation validating business requirements. Focus on business logic validation (không phải technical QA). Phù hợp cho pre-release validation và client sign-off.
+
+**Structure:**
+```
+.claude/skills/uat-test-suite/
+├── SKILL.md                           # Main skill definition
+├── references/
+│   ├── industry-standards.md          # Testing standards
+│   ├── priority-classification.md     # Priority levels
+│   └── uat-best-practices.md          # Best practices
+├── examples/
+│   ├── large-enterprise-system.md     # Enterprise example
+│   └── small-saas-platform.md         # SaaS example
+├── scripts/
+│   └── validate-uat.js               # Validation script
+└── templates/
+    └── uat-output-template.md         # Output template
+```
+
+**Output:** Single `UAT-{ProjectName}.md` file containing:
+- Summary tables
+- Module-by-module test cases (10-column format)
+- Coverage traceability matrix
+- Gap analysis with recommendations
+
+**Chi tiết:** Xem `.claude/skills/uat-test-suite/SKILL.md`
 
 ## Rules System
 
@@ -750,29 +944,72 @@ cursor-pro-max/
 │
 ├── .claude/
 │   └── skills/                      # AI Skills (YAML + references + examples)
+│       ├── claudeception/
+│       │   ├── SKILL.md             # Continuous learning system
+│       │   ├── references/          # Research refs, skill template
+│       │   ├── examples/            # 3 extracted skills (Next.js, Prisma, TS)
+│       │   └── scripts/
+│       │       └── claudeception-activator.sh
 │       ├── grammar-learning/
-│       │   ├── SKILL.md             # Main skill definition (186 dòng)
+│       │   ├── SKILL.md             # Main skill definition
 │       │   ├── references/          # Knowledge base
-│       │   │   ├── grammar-rules.md            # 9 categories (454 dòng)
+│       │   │   ├── grammar-rules.md            # 9 categories
 │       │   │   ├── common-mistakes-vn.md       # 10 common errors
-│       │   │   └── vietnamese-writing-style.md # Writing guidelines (232 dòng)
+│       │   │   └── vietnamese-writing-style.md # Writing guidelines
 │       │   └── examples/
 │       │       └── sample-corrections.md       # 4 example scenarios
-│       └── lyra-prompt-optimizer/
-│           ├── SKILL.md             # Prompt optimization skill (380 dòng)
-│           ├── references/          # Core documentation
-│           │   ├── reasoning-frameworks.md     # CoT, ToT, GoT, AoT (512 dòng)
-│           │   ├── optimization-toolkit.md     # Techniques catalog (618 dòng)
-│           │   ├── core-concepts.md            # 4D methodology (432 dòng)
-│           │   ├── vietnamese-guide.md         # Bilingual support (341 dòng)
-│           │   └── anti-patterns.md            # Common mistakes (441 dòng)
+│       ├── humanizer/
+│       │   ├── SKILL.md             # Remove AI writing patterns
+│       │   ├── references/          # AI patterns, personality guide
+│       │   │   ├── ai-writing-patterns.md
+│       │   │   ├── personality-and-soul.md
+│       │   │   └── wikipedia-source-guide.md
+│       │   └── examples/
+│       │       ├── full-humanization.md
+│       │       └── quick-fixes.md
+│       ├── lyra-prompt-optimizer/
+│       │   ├── SKILL.md             # Prompt optimization skill
+│       │   ├── references/          # Core documentation
+│       │   │   ├── reasoning-frameworks.md     # CoT, ToT, GoT, AoT
+│       │   │   ├── optimization-toolkit.md     # Techniques catalog
+│       │   │   ├── core-concepts.md            # 4D methodology
+│       │   │   ├── vietnamese-guide.md         # Bilingual support
+│       │   │   └── anti-patterns.md            # Common mistakes
+│       │   ├── examples/
+│       │   │   ├── quick-boost/     # Basic optimization (3 examples)
+│       │   │   ├── deep-dive/       # Advanced optimization (4 examples)
+│       │   │   ├── revolutionary/   # Maximum optimization (3 examples)
+│       │   │   └── vietnamese/      # Vietnamese examples (2 examples)
+│       │   └── scripts/
+│       │       └── quality-check.sh # Validation script
+│       ├── matrix-test-suite/
+│       │   ├── SKILL.md             # Matrix-based test generation
+│       │   ├── references/          # Combinatorics, coverage guides
+│       │   │   ├── combinatorics-cheatsheet.md
+│       │   │   ├── coverage-calculation-guide.md
+│       │   │   └── matrix-shapes-library.md
+│       │   ├── examples/
+│       │   │   ├── large-ecommerce-checkout.md
+│       │   │   └── small-hotpot-pricing.md
+│       │   ├── scripts/
+│       │   │   └── validate-matrix.js
+│       │   └── templates/           # Output templates
+│       │       ├── coverage-report-template.md
+│       │       ├── matrix-output-template.md
+│       │       └── testcases-output-template.md
+│       └── uat-test-suite/
+│           ├── SKILL.md             # UAT documentation generator
+│           ├── references/          # Industry standards, best practices
+│           │   ├── industry-standards.md
+│           │   ├── priority-classification.md
+│           │   └── uat-best-practices.md
 │           ├── examples/
-│           │   ├── quick-boost/     # Basic optimization (3 examples)
-│           │   ├── deep-dive/       # Advanced optimization (4 examples)
-│           │   ├── revolutionary/   # Maximum optimization (3 examples)
-│           │   └── vietnamese/      # Vietnamese examples (2 examples)
-│           └── scripts/
-│               └── quality-check.sh # Validation script
+│           │   ├── large-enterprise-system.md
+│           │   └── small-saas-platform.md
+│           ├── scripts/
+│           │   └── validate-uat.js
+│           └── templates/
+│               └── uat-output-template.md
 │
 ├── GLOBAL_RULE.md                   # System prompt (5,600 dòng, v2.0.0)
 ├── CLAUDE.md                        # Project documentation
@@ -967,7 +1204,7 @@ MIT License - Xem [LICENSE](LICENSE) để biết chi tiết.
 - **[CLAUDE.md](CLAUDE.md)** - Project overview và key concepts
 - **[GLOBAL_RULE.md](GLOBAL_RULE.md)** - System prompt v2.0.0 (5,600 dòng)
 - **Commands**: Xem individual files trong `.cursor/commands/`
-- **Skills**: Xem `.cursor/skills/grammar-learning/SKILL.md`
+- **Skills**: Xem `.claude/skills/` (6 skills: claudeception, grammar-learning, humanizer, lyra-prompt-optimizer, matrix-test-suite, uat-test-suite)
 
 ### Repository
 
