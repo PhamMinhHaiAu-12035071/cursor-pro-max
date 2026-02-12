@@ -52,6 +52,34 @@ Skip it when:
 - It is a small, low-risk quick fix
 - You already have full scope, constraints, and plan
 
+### Quick Underspecified Check
+
+Before starting, evaluate if the request needs an interview. It is underspecified if any of these are unclear after reading the codebase:
+
+- [ ] Objective: what should change vs stay the same
+- [ ] Done: acceptance criteria, examples, edge cases
+- [ ] Scope: which files, components, or users are in or out
+- [ ] Constraints: compatibility, performance, style, dependencies, timeline
+- [ ] Environment: language and runtime versions, OS, build and test runner
+- [ ] Safety: data migration needs, rollout and rollback risk, reversibility
+
+If two or more items are unclear, run the full interview.
+If one item is unclear, ask a quick clarification (1-3 questions) and proceed.
+If all are clear, skip the interview entirely.
+
+```mermaid
+graph TD
+    Request[User Request] --> Scan[Scan codebase for context]
+    Scan --> Check{How many checklist items are unclear?}
+    Check -->|0 unclear| Skip[Skip interview - proceed directly]
+    Check -->|1 unclear| Quick[Quick clarification: 1-3 questions]
+    Check -->|2+ unclear| Full[Full /interview process]
+    Quick --> Proceed[Confirm assumptions then proceed]
+    Full --> Phase1[Phase 1: Discovery]
+```
+
+> **Alignment note**: This triage connects to the `assumption_surfacing` and `confusion_management` behaviors defined in [GLOBAL_RULE.md](../../GLOBAL_RULE.md). When uncertain, surface assumptions explicitly rather than guessing.
+
 ---
 
 ## How It Works
@@ -94,15 +122,30 @@ Iteration logic:
 
 ```text
 WHILE (important details are missing or ambiguous) {
-  1. Identify knowledge gaps
-  2. Ask 3-5 targeted questions
-  3. Analyze answers
-  4. Update understanding
-  5. If answer is unclear, ask follow-up right away
+  1. Run reasoning checklist (Principle 7)
+  2. Identify knowledge gaps that survived the filter
+  3. Ask 3-5 targeted questions with compact format
+  4. Analyze answers
+  5. Update understanding
+  6. If answer is unclear, ask follow-up right away
 }
 ```
 
 Target duration: 2 to 5 minutes, depending on complexity.
+
+---
+
+### Phase 2.5: Confirm Interpretation
+
+Before generating the full plan, restate the collected requirements:
+
+1. What we are building (1-2 sentences)
+2. Key constraints and decisions made
+3. What success looks like (acceptance criteria summary)
+
+Ask the user to confirm or correct. Proceed to Phase 3 only after confirmation.
+
+Target duration: 15 to 30 seconds.
 
 ---
 
@@ -312,6 +355,28 @@ Do you want performance optimization?
 
 Why weak: too broad. Ask for explicit targets instead.
 
+Support compact replies to reduce friction:
+
+- Offer a `defaults` fast-path to accept all recommended choices at once
+- Support shorthand format: `1b 2a 3c` to answer multiple questions in one reply
+- Include "Not sure - use default" as an option when helpful
+
+Example format:
+
+```text
+1) State management?
+   a) Zustand (Recommended - lightweight, TypeScript-friendly)
+   b) Redux Toolkit (strong tooling, more boilerplate)
+   c) Not sure - use default
+
+2) Data fetching?
+   a) TanStack Query (Recommended - caching, background refresh)
+   b) SWR (simpler API, fewer features)
+   c) Custom hooks (full control, more work)
+
+Reply: `defaults` or `1a 2b`
+```
+
 ### 2. Do not ask what the codebase already tells you
 
 Avoid:
@@ -388,6 +453,161 @@ Stage 3 (verification):
 - Testing strategy
 - Performance/security requirements
 - Delivery criteria
+
+### 7. Reason before asking
+
+Before presenting questions, run this internal checklist:
+
+1. What do I already know from scanning the codebase?
+2. What am I genuinely uncertain about?
+3. Which uncertainties matter right now for the current phase?
+4. Can I set reasonable defaults for any of these?
+5. For remaining questions, what are the real tradeoffs between options?
+
+Only questions that survive all five filters should be asked.
+
+### 8. Do not act until must-have answers arrive
+
+Until critical questions are answered:
+- Do not edit files, run commands, or generate code
+- Do not commit to a specific implementation direction
+- Low-risk discovery (reading files, scanning structure) is allowed
+
+If the user says "just go ahead" or "proceed with defaults":
+1. State your assumptions as a numbered list
+2. Wait for explicit confirmation before starting
+
+### 9. Every option needs context and tradeoffs
+
+Bad:
+
+```text
+Database: PostgreSQL | MongoDB | SQLite
+```
+
+Good:
+
+```text
+Database (your data has complex relationships):
+- PostgreSQL (relational, ACID, mature ecosystem)
+- MongoDB (flexible schema, horizontal scaling)
+- SQLite (zero-ops, embedded, single-writer limitation)
+```
+
+Each option must answer: why would someone pick this one?
+
+---
+
+## Question Templates
+
+Use these templates to structure questions consistently. Adapt the format to fit the context.
+
+### Technology Choice
+
+When the user must select between valid technical approaches:
+
+```text
+[Technology area] for [specific purpose]?
+- Option A (Recommended - [1-line reason])
+- Option B ([key tradeoff])
+- Option C ([key tradeoff])
+- Not sure - use default
+```
+
+Example:
+
+```text
+Authentication library for your Next.js app?
+- NextAuth.js v5 (Recommended - native Next.js integration, active community)
+- Lucia (lightweight, more manual setup)
+- Custom with jose + bcrypt (full control, more maintenance)
+- Not sure - use default
+```
+
+Use when: selecting frameworks, libraries, tools, or technical approaches.
+
+### Scope Clarification
+
+When requirements are ambiguous and you need to confirm boundaries:
+
+```text
+What level of [feature area] do you need?
+a) MVP - [minimal description] (Recommended for first iteration)
+b) Standard - [moderate description]
+c) Full - [comprehensive description]
+```
+
+Example:
+
+```text
+What level of error handling do you need?
+a) MVP - try/catch with generic error messages (Recommended for first iteration)
+b) Standard - typed errors, user-friendly messages, basic retry logic
+c) Full - error boundaries, granular error types, retry with backoff, error reporting
+```
+
+Use when: the feature has natural tiers of completeness (MVP / Standard / Full).
+
+### UX Decision
+
+When user-facing behavior has multiple valid options:
+
+```text
+How should [interaction] behave?
+- Option A (Recommended - [user benefit])
+- Option B ([user benefit])
+- Option C ([user benefit])
+```
+
+Example:
+
+```text
+How should form validation feedback appear?
+- Inline errors on blur (Recommended - immediate feedback without interruption)
+- Inline errors on submit (less noisy, but delayed feedback)
+- Toast notification (non-blocking, but easy to miss)
+```
+
+Use when: choosing user-facing behavior, layout, interaction patterns, or feedback mechanisms.
+
+### Architecture Decision
+
+When structural or design pattern choices affect the codebase long-term:
+
+```text
+Architecture approach for [component/system]?
+- Option A (Recommended - [architectural benefit])
+- Option B ([architectural benefit])
+- Option C ([architectural benefit])
+
+Impact: [what this decision affects downstream]
+```
+
+Example:
+
+```text
+State management architecture for the dashboard?
+- Feature-based stores with Zustand (Recommended - collocated state, easy testing)
+- Global Redux store (centralized, strong devtools)
+- React Context per feature (no dependencies, limited performance)
+
+Impact: affects component coupling, testing strategy, and bundle size.
+```
+
+Use when: choosing patterns, module boundaries, data flow strategies, or structural decisions.
+
+---
+
+## Anti-Patterns
+
+Avoid these common interview mistakes:
+
+1. **Do not ask generic questions without codebase context** - always scan first, then ask about what you could not determine
+2. **Do not ask about things already decided** - check `package.json`, config files, and existing code before asking about stack choices
+3. **Do not use yes/no when multiple options exist** - offer concrete alternatives with tradeoffs instead
+4. **Do not overwhelm with more than 5 questions per round** - batch into focused rounds of 3-5 questions
+5. **Do not use vague headers** - bad: "Choice?", good: "Database engine for user data?"
+6. **Do not present options without tradeoffs** - every option must explain why someone would pick it (see Principle 9)
 
 ---
 
@@ -476,25 +696,58 @@ Recommended options:
 - Custom auth with jose + bcrypt
 ```
 
-Interview sample (round-based):
+Reasoning (internal, before asking):
+
+```text
+Already known from codebase:
+- Next.js 14 App Router, Prisma + PostgreSQL, API routes exist
+- No auth library installed yet
+
+Genuinely uncertain:
+- Which auth library the user prefers
+- Which OAuth providers are required
+- Session strategy (JWT vs DB)
+
+Defaults I can set:
+- NextAuth.js (best Next.js integration)
+- JWT sessions (stateless, simpler)
+```
+
+Interview sample (round-based, compact format):
 
 ```text
 Round 1 - Big picture
-Q1. Which auth library should we use?
-- NextAuth.js (Recommended)
-- Lucia
-- Custom
 
-Q2. Which OAuth providers are required?
-- Google
-- GitHub
-- Facebook
-- X/Twitter
+1) Auth library?
+   a) NextAuth.js v5 (Recommended - native Next.js, large community)
+   b) Lucia (lightweight, more manual setup)
+   c) Custom with jose + bcrypt (full control, more work)
+   d) Not sure - use default
 
-Q3. Session approach?
-- JWT (Recommended for stateless APIs)
-- DB sessions (strong revocation control)
-- Hybrid
+2) OAuth providers needed?
+   a) Google + GitHub (Recommended - covers most users)
+   b) Google + GitHub + Facebook
+   c) Google + GitHub + Facebook + X/Twitter
+   d) Custom list (specify)
+
+3) Session strategy?
+   a) JWT (Recommended - stateless, works well with API routes)
+   b) DB sessions (strong revocation, more infrastructure)
+   c) Hybrid (JWT short-lived + DB for refresh)
+
+Reply: `defaults` or `1a 2b 3c`
+```
+
+Confirm interpretation (Phase 2.5):
+
+```text
+Before I build the plan, here is what I understand:
+
+1. We are building email/password auth with Google + GitHub OAuth
+2. Key decisions: NextAuth.js v5, JWT sessions, Prisma models
+3. Success: users can sign up, log in, reset password, and use OAuth
+
+Please confirm or correct, then I will generate the full plan.
 ```
 
 Summary sample (shortened):
@@ -527,7 +780,7 @@ Summary sample (shortened):
 - `npm run build`
 ```
 
-### Example 2: Quick Feature - Dark Mode Toggle
+### Example 2: Quick Feature - Dark Mode Toggle (Quick Triage Path)
 
 Input:
 
@@ -537,33 +790,30 @@ Input:
 User: "Add a dark mode toggle"
 ```
 
-Discovery output:
+Underspecified check:
 
 ```text
-Detected:
-- Next.js + Tailwind CSS
-- No current theme system
-Recommendation:
-- next-themes
+- [x] Objective: add dark mode toggle (clear)
+- [x] Done: toggle works, persists preference (clear)
+- [ ] Scope: unclear - which components need dark variants?
+- [x] Constraints: Tailwind already in use (clear from codebase)
+- [x] Environment: Next.js + Tailwind (clear from codebase)
+- [x] Safety: no data migration, low risk (clear)
+
+Result: 1 item unclear -> Quick clarification (skip full interview)
 ```
 
-Interview sample:
+Quick clarification (1-3 questions instead of full interview):
 
 ```text
-Q1. Theme implementation?
-- next-themes + Tailwind (Recommended)
-- Custom context
-- Manual CSS variables
+I scanned the codebase and most things are clear. One quick question:
 
-Q2. Default theme?
-- System preference (Recommended)
-- Light
-- Dark
+1) Which components need dark mode support?
+   a) All pages and components (Recommended - consistent experience)
+   b) Only the main layout and navigation
+   c) Specific pages (list them)
 
-Q3. Toggle UI?
-- Icon button (Recommended)
-- Dropdown
-- Keyboard shortcut only
+Reply: `defaults` or `1b`
 ```
 
 Output (short):
@@ -704,12 +954,22 @@ Fix:
 ## Metadata
 
 - Command: `/interview`
-- Version: `1.0.0`
+- Version: `1.1.0`
 - Created: `2026-02-04`
+- Updated: `2026-02-12`
 - Language: `English`
 - Complexity: `Advanced`
 - Dependencies: `AskQuestion` tool
 - Estimated duration: `3-8 minutes`
+
+---
+
+## References
+
+- [ask-questions-if-underspecified](https://github.com/thienanblog/awesome-ai-agent-skills) by thienanblog
+- [ask-questions skill](https://github.com/the-vampiire/ask-questions-skill) by the-vampiire
+- [A practical guide to building agents](https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/) by OpenAI
+- [GLOBAL_RULE.md](../../GLOBAL_RULE.md) behavioral alignment (assumption_surfacing, confusion_management)
 
 ---
 
@@ -724,5 +984,6 @@ Fix:
 
 - `lyra-prompt-optimizer`
 - Use after `/interview` to improve prompts for downstream AI agents
+- `ask-questions-if-underspecified` - Structured clarification for underspecified requests
 
 Generated by `/create-command`.

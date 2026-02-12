@@ -1,0 +1,360 @@
+---
+description: "LEVER framework for code optimization - always extend existing code before creating new. Apply scoring for every feature implementation."
+globs:
+alwaysApply: false
+---
+
+# Code Optimization Principles & Pre-Implementation Analysis
+
+## Overview
+
+This rule establishes optimization principles for extending existing code rather than creating new implementations. Based on proven patterns achieving 87% code reduction in real-world projects.
+
+## Core Philosophy
+
+> "The best code is no code. The second best code is code that already exists and works."
+
+---
+
+## The LEVER Framework
+
+**L**everage existing patterns  
+**E**xtend before creating  
+**V**erify through testing  
+**E**liminate duplication  
+**R**educe complexity
+
+**Note**: LEVER is a custom framework combining principles from SOLID, DRY, YAGNI, and KISS.
+
+---
+
+## Pre-Implementation Analysis
+
+Before writing any code, complete this analysis:
+
+### Step 1: Pattern Recognition
+
+Search codebase for similar existing functionality before writing any new code.
+
+**Questions to answer:**
+- What similar functionality already exists?
+- Which functions/modules handle related data?
+- What components display similar information?
+- Which utilities manage related state?
+
+### Step 2: Complexity Assessment
+
+Compare: lines to extend existing vs lines to create new.
+
+**If extend < 50% of create**, proceed with extension.
+
+**Metrics to track:**
+- Lines of new code vs lines extending existing
+- New files created vs files modified
+- New database tables vs fields added to existing
+- New API endpoints vs existing endpoints enhanced
+
+---
+
+## Decision Tree
+
+```
+1. New Feature Request
+   -> Can existing code handle it? YES -> Extend existing code
+   -> NO -> Can we modify existing patterns? YES -> Adapt and extend
+   -> NO -> Is the new code reusable? YES -> Create abstraction
+   -> NO -> Reconsider approach
+```
+
+---
+
+## Architecture Principles
+
+### 1. Database Schema Extensions
+
+#### ❌ Anti-Pattern: Creating New Tables
+
+```sql
+-- DON'T: Create separate tracking table
+CREATE TABLE user_metadata (
+  user_id INT,
+  source VARCHAR(255),
+  campaign VARCHAR(255),
+  -- ... 10 more fields
+)
+-- Requires joins, separate queries, sync logic
+```
+
+#### ✅ Pattern: Extend Existing Tables
+
+```sql
+-- DO: Add fields to users table
+ALTER TABLE users ADD COLUMN
+  source VARCHAR(255),
+  campaign VARCHAR(255);
+-- Data locality, no joins, existing indexes work
+```
+
+### 2. API Optimization
+
+#### ❌ Anti-Pattern: Duplicate Endpoints
+
+```javascript
+// DON'T: Create similar endpoints
+app.get('/api/users/active', ...)
+app.get('/api/users/trial', ...)
+app.get('/api/users/premium', ...)
+```
+
+#### ✅ Pattern: Extend Existing Endpoints
+
+```javascript
+// DO: Add query parameters to existing endpoint
+app.get('/api/users', (req, res) => {
+  const { status, type } = req.query
+  // Filter based on parameters
+  // Return enhanced data
+})
+```
+
+### 3. Frontend State Management
+
+#### ❌ Anti-Pattern: New Hooks for Similar Data
+
+```javascript
+// DON'T: Create overlapping hooks
+export function useUserStatus() { /* ... */ }
+export function useUserMetadata() { /* ... */ }
+export function useUserMetrics() { /* ... */ }
+```
+
+#### ✅ Pattern: Enhance Existing Hooks
+
+```javascript
+// DO: Extend existing hook
+export function useUser() {
+  const userData = useQuery('/api/user')
+  
+  // Add computed properties for new features
+  const enhanced = useMemo(() => ({
+    ...userData,
+    // New properties derived from existing data
+    isEligibleForTrial: !userData.hasPaid && userData.daysActive > 7,
+    conversionValue: calculateValue(userData),
+  }), [userData])
+  
+  return enhanced
+}
+```
+
+---
+
+## Decision Framework
+
+### When to Extend vs Create New
+
+Use this scoring system:
+
+| Criteria | Extend Existing | Create New |
+|----------|----------------|------------|
+| Similar data structure exists | +3 points | -3 points |
+| Can reuse existing indexes/queries | +2 points | -2 points |
+| Existing functions return related data | +3 points | -3 points |
+| UI components show similar info | +2 points | -2 points |
+| Would require <50 lines to extend | +3 points | -3 points |
+| Would introduce circular dependencies | -5 points | +5 points |
+| Significantly different domain | -3 points | +3 points |
+
+**Score > 5**: Extend existing code  
+**Score < -5**: Create new implementation  
+**Score -5 to 5**: Deeper analysis required
+
+---
+
+## Implementation Strategy
+
+### The Three-Pass Approach
+
+**Pass 1: Discovery (No Code)**
+- Find all related existing code
+- Document current patterns
+- Identify extension points
+
+**Pass 2: Design (Minimal Code)**
+- Write interface changes only
+- Update type definitions
+- Plan data flow
+
+**Pass 3: Implementation (Optimized Code)**
+- Implement with maximum reuse
+- Add only essential new logic
+- Document why choices were made
+
+---
+
+## Code Reuse Patterns
+
+### Pattern 1: Feature Flags in Existing Components
+
+```javascript
+// Instead of new component
+export function Dashboard() {
+  const { user, metadata } = useUser()
+  
+  return (
+    <>
+      {/* Existing UI */}
+      
+      {/* Conditionally show new features */}
+      {metadata?.isFromCampaign && (
+        <CampaignBadge source={metadata.source} />
+      )}
+    </>
+  )
+}
+```
+
+### Pattern 2: Computed Properties
+
+```javascript
+// Instead of new API calls
+export async function getUser(id) {
+  const user = await db.users.findById(id)
+  
+  // Compute new properties from existing data
+  return {
+    ...user,
+    // Derived metrics
+    conversionValue: user.tier ? prices[user.tier] * 12 : 0,
+    isHighValue: user.tier === 'premium' && user.status === 'trial',
+  }
+}
+```
+
+---
+
+## Performance Optimization Rules
+
+### 1. Query Consolidation
+
+```javascript
+// ❌ Multiple queries
+const user = await getUser(id)
+const subscription = await getSubscription(userId)
+const usage = await getUsage(userId)
+
+// ✅ Single query returning all data
+const userStatus = await getUserStatus(id)
+// Returns user + subscription + usage in one call
+```
+
+### 2. Batch Operations
+
+```javascript
+// ❌ Sequential operations
+for (const item of items) {
+  await db.update(item.id, updates)
+}
+
+// ✅ Batch when possible
+await Promise.all(
+  items.map(item => db.update(item.id, updates))
+)
+```
+
+---
+
+## Anti-Patterns to Avoid
+
+### 1. The "Just One More Table" Trap
+
+Each new table adds:
+- Schema complexity
+- Join requirements
+- Sync challenges
+- Migration overhead
+
+**Ask**: Can this data live in an existing table?
+
+### 2. The "Similar But Different" Excuse
+
+Before creating `getUserTrialStatus` when `getUserStatus` exists:
+- Can `getUserStatus` return trial fields?
+- Can we add an `includeTrial` parameter?
+- Can computed properties derive what we need?
+
+### 3. The "UI Drives Database" Mistake
+
+Never create database structure to match UI components. Instead:
+- Store data in its most logical form
+- Use queries to transform for UI
+- Let components compute display values
+
+---
+
+## Documentation Requirements
+
+When extending existing code, document WHY:
+
+```javascript
+// Document WHY you're extending
+export async function getUserStatus(id) {
+  // ... existing implementation ...
+  
+  // OPTIMIZATION: Added campaign fields here instead of creating
+  // separate tracking table. Saves joins and maintains data locality.
+  
+  return {
+    // ... existing fields ...
+    campaignSource: user?.source,
+    inviteCode: user?.inviteCode,
+  }
+}
+```
+
+---
+
+## Review Checklist
+
+Before submitting optimized code:
+
+- [ ] Extended existing tables/schemas instead of creating new ones
+- [ ] Reused existing queries/functions with additions
+- [ ] Leveraged existing hooks and components
+- [ ] No duplicate state management logic
+- [ ] Documented why extensions were chosen
+- [ ] Maintained backward compatibility
+- [ ] Added fields are optional (nullable/optional)
+- [ ] No circular dependencies introduced
+- [ ] Performance same or better
+- [ ] Code reduction >50%
+
+---
+
+## Alignment with Industry Principles
+
+LEVER builds on established software engineering principles:
+
+- **SOLID**: Open/Closed Principle (extend, don't modify)
+- **DRY**: Don't Repeat Yourself (eliminate duplication)
+- **YAGNI**: You Aren't Gonna Need It (reduce complexity)
+- **KISS**: Keep It Simple (leverage existing patterns)
+
+---
+
+## Success Metrics
+
+Track optimization success:
+
+| Metric | Target |
+|--------|--------|
+| Code reduction vs initial approach | >50% |
+| Reused existing patterns | >70% |
+| New files created | <3 per feature |
+| New database tables | 0 (extend existing) |
+| Query complexity | No new indexes |
+| Implementation time | <50% of estimate |
+
+---
+
+*Remember: Every line of code is a liability. The best feature is one that requires no new code, just better use of what exists.*

@@ -14,13 +14,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```
 .cursor/
-└── commands/           # Cursor slash commands (plain .md files)
-    ├── interview.md    # Phỏng vấn thu thập requirements
-    ├── phase-plan.md   # Tổ chức công việc theo phases
-    ├── council.md      # Multi-agent coordination
-    ├── create-rule.md  # Hướng dẫn tạo Cursor rules
-    ├── create-command.md # Meta-command generator
-    └── check-grammar.md  # Grammar checking
+├── commands/           # Cursor slash commands (plain .md files)
+│   ├── interview.md    # Phỏng vấn thu thập requirements
+│   ├── phase-plan.md   # Tổ chức công việc theo phases
+│   ├── council.md      # Multi-agent coordination
+│   ├── create-rule.md  # Hướng dẫn tạo Cursor rules
+│   ├── create-command.md # Meta-command generator
+│   ├── check-grammar.md  # Grammar checking
+│   ├── generate-agents.md # Generate AGENTS.md hierarchy
+│   └── generate-claude.md # Generate CLAUDE.md hierarchy
+│
+└── rules/              # Cursor rules (.mdc files)
+    └── optimization-principles.mdc # LEVER framework for code optimization
 
 .claude/
 └── skills/             # AI Skills với YAML frontmatter

@@ -27,7 +27,7 @@ Project này được thiết kế để:
 
 ## Tính Năng Chính
 
-### Commands System (6 slash commands)
+### Commands System (8 slash commands)
 
 Commands là các workflow có thể gọi bằng `/command-name`:
 
@@ -62,6 +62,18 @@ Commands là các workflow có thể gọi bằng `/command-name`:
   - Hướng dẫn tạo Cursor rules
   - Educational guide với examples
   - Phân biệt Commands vs Rules
+
+- **`/generate-agents`** (~280 dòng, Advanced)
+  - Generate hierarchical AGENTS.md structure for any codebase
+  - Follows agents.md open standard
+  - Token-efficient, progressive disclosure
+  - Supports simple/multi-package/monorepo projects
+
+- **`/generate-claude`** (~390 dòng, Advanced)
+  - Generate CLAUDE.md hierarchy optimized for Claude Code
+  - Includes hooks, MCP integration, custom commands
+  - 6-level memory hierarchy support
+  - Claude Code 2026 features (CLAUDE.local.md, .claudeignore, /init)
 
 ### Skills System (6 skills)
 
@@ -109,9 +121,18 @@ Skills là các AI capabilities tự động activate khi match triggers:
   - Triggers: "UAT", "user acceptance testing", "test plan", "acceptance criteria"
   - References: industry standards, priority classification, UAT best practices
 
-### Rules System
+### Rules System (1 rule)
 
-Rules system được document đầy đủ trong `.cursor/commands/create-rule.md` nhưng chưa có rules nào được implement. Bạn có thể tạo rules để apply coding standards tự động khi mở files.
+Rules system cho phép apply coding standards tự động khi mở files matching glob patterns:
+
+- **`optimization-principles.mdc`** (~218 dòng)
+  - LEVER framework for code optimization
+  - Always extend existing code before creating new
+  - Stack-agnostic, generic principles
+  - Decision framework with scoring system
+  - Alignment with SOLID, DRY, YAGNI, KISS
+
+**Learn more:** Xem `.cursor/commands/create-rule.md` để hiểu cách tạo rules mới.
 
 ### System Prompt (GLOBAL_RULE.md v2.0.0)
 
@@ -178,7 +199,8 @@ Installs cursor-pro-max vào target directory với interactive conflict resolut
 ```
 
 **What Gets Installed:**
-- `.cursor/commands/` - 6 slash commands
+- `.cursor/commands/` - 8 slash commands
+- `.cursor/rules/` - 1 rule (optimization-principles.mdc)
 - `.claude/skills/` - 6 AI skills (claudeception, grammar-learning, humanizer, lyra-prompt-optimizer, matrix-test-suite, uat-test-suite)
 - `GLOBAL_RULE.md` - System prompt (~5,600 lines)
 
@@ -518,6 +540,8 @@ Dưới đây là danh sách đầy đủ các commands với mô tả:
 | `/phase-plan` | Simple | 11 | Phased work organization | Break work thành phases cho teams |
 | `/create-command` | Advanced | 870 | Meta-command generator | Tạo slash commands mới |
 | `/create-rule` | Advanced | 1,367 | Rule creation guide | Học cách tạo Cursor rules |
+| `/generate-agents` | Advanced | ~280 | Generate AGENTS.md hierarchy | Create agent guidance for any codebase |
+| `/generate-claude` | Advanced | ~390 | Generate CLAUDE.md hierarchy | Create Claude Code configuration |
 
 ### `/check-grammar` - Grammar Checking với Middleware Mode
 
@@ -641,6 +665,60 @@ Educational guide để học cách tạo Cursor rules.
 - Troubleshooting
 
 **Chi tiết:** Xem `.cursor/commands/create-rule.md`
+
+---
+
+### `/generate-agents` - Generate AGENTS.md Hierarchy
+
+**Input format:**
+```
+/generate-agents
+```
+
+AI sẽ analyze codebase và generate hierarchical AGENTS.md structure.
+
+**Features:**
+- Follows agents.md open standard
+- Token-efficient (root <150 lines, sub-files <120 lines)
+- Progressive disclosure (3-layer approach)
+- Supports simple/multi-package/monorepo projects
+- 6 Core Areas coverage (commands, testing, structure, code style, git, boundaries)
+
+**Output:**
+- Root AGENTS.md (lightweight index)
+- Sub-folder AGENTS.md files (detailed patterns)
+- JIT index with search commands
+
+**Chi tiết:** Xem `.cursor/commands/generate-agents.md`
+
+---
+
+### `/generate-claude` - Generate CLAUDE.md Hierarchy
+
+**Input format:**
+```
+/generate-claude
+```
+
+AI sẽ analyze codebase và generate Claude Code-optimized CLAUDE.md hierarchy.
+
+**Features:**
+- 6-level memory hierarchy support
+- Hooks configuration (.claude/settings.json)
+- Custom slash commands (.claude/commands/)
+- MCP server recommendations
+- Claude Code 2026 features (CLAUDE.local.md, .claudeignore, /init)
+
+**Output:**
+- Root CLAUDE.md (80-130 lines)
+- Subdirectory CLAUDE.md files
+- Hooks configuration
+- Custom commands
+- MCP setup guide
+
+**Chi tiết:** Xem `.cursor/commands/generate-claude.md`
+
+---
 
 ## Skills Chi Tiết
 
@@ -937,10 +1015,12 @@ cursor-pro-max/
 │   │   ├── create-command.md        # Meta-command generator (870 dòng)
 │   │   ├── create-rule.md           # Rule creation guide (1,367 dòng)
 │   │   ├── interview.md             # Requirements gathering (1,074 dòng)
-│   │   └── phase-plan.md            # Phased work (11 dòng)
+│   │   ├── phase-plan.md            # Phased work (11 dòng)
+│   │   ├── generate-agents.md       # Generate AGENTS.md hierarchy (~280 dòng)
+│   │   └── generate-claude.md       # Generate CLAUDE.md hierarchy (~390 dòng)
 │   │
-│   └── rules/                       # [Chưa tạo] Cursor rules (.mdc files)
-│       └── (empty - chưa có rules)
+│   └── rules/                       # Cursor rules (.mdc files)
+│       └── optimization-principles.mdc  # LEVER framework (~218 dòng)
 │
 ├── .claude/
 │   └── skills/                      # AI Skills (YAML + references + examples)
@@ -1027,7 +1107,7 @@ cursor-pro-max/
 | **Activation** | Manual (`/command`) | Auto (via description triggers) | Auto (glob pattern matching) |
 | **Purpose** | Workflow/Action | Domain knowledge/capability | Standards/Patterns |
 | **Scope** | Single invocation | Multi-use capability | File-scoped persistent |
-| **Example** | `/interview` | `grammar-learning` | `typescript-standards.mdc` |
+| **Example** | `/interview` | `grammar-learning` | `optimization-principles.mdc` |
 
 ### Cách Hoạt Động
 
