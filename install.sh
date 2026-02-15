@@ -7,7 +7,7 @@ if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
   echo "Usage: ./install.sh <target-directory>"
   echo "Example: ./install.sh /path/to/your-project"
   echo ""
-  echo "Copies .cursor/commands, .claude/skills, and GLOBAL_RULE.md into target."
+  echo "Copies .cursor/commands, .cursor/rules, .claude/skills, and GLOBAL_RULE.md into target."
   echo "Safe to re-run (updates existing files)."
   exit 0
 fi
@@ -28,6 +28,11 @@ fi
 mkdir -p "$TARGET/.cursor/commands"
 cp "$SCRIPT_DIR"/.cursor/commands/*.md "$TARGET/.cursor/commands/"
 echo "Copied .cursor/commands/"
+
+# Rules
+mkdir -p "$TARGET/.cursor/rules"
+cp "$SCRIPT_DIR"/.cursor/rules/*.mdc "$TARGET/.cursor/rules/"
+echo "Copied .cursor/rules/"
 
 # Skills
 mkdir -p "$TARGET/.claude/skills"
