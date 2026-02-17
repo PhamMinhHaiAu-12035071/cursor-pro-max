@@ -75,7 +75,7 @@ Commands là các workflow có thể gọi bằng `/command-name`:
   - 6-level memory hierarchy support
   - Claude Code 2026 features (CLAUDE.local.md, .claudeignore, /init)
 
-### Skills System (6 skills)
+### Skills System (5 skills)
 
 Skills là các AI capabilities tự động activate khi match triggers:
 
@@ -91,12 +91,6 @@ Skills là các AI capabilities tự động activate khi match triggers:
   - Pattern detection cho lỗi phổ biến của người Việt
   - References: grammar rules, common mistakes, writing style
   - Examples: sample corrections
-
-- **`humanizer`**
-  - Remove AI writing patterns, make text sound natural and human-written
-  - 24 documented AI writing patterns based on Wikipedia's "Signs of AI writing"
-  - Triggers: "humanize this text", "make this less robotic", "remove AI patterns"
-  - References: AI writing patterns, personality injection guide
 
 - **`lyra-prompt-optimizer`**
   - AI prompt optimization và engineering
@@ -201,7 +195,7 @@ Installs cursor-pro-max vào target directory với interactive conflict resolut
 **What Gets Installed:**
 - `.cursor/commands/` - 8 slash commands
 - `.cursor/rules/` - 1 rule (optimization-principles.mdc)
-- `.claude/skills/` - 6 AI skills (claudeception, grammar-learning, humanizer, lyra-prompt-optimizer, matrix-test-suite, uat-test-suite)
+- `.claude/skills/` - 5 AI skills (claudeception, grammar-learning, lyra-prompt-optimizer, matrix-test-suite, uat-test-suite)
 - `GLOBAL_RULE.md` - System prompt (~5,600 lines)
 
 **Conflict Resolution:**
@@ -809,38 +803,6 @@ Không chỉ sửa lỗi mà còn DẠY ngữ pháp qua việc giải thích T�
 
 ---
 
-### humanizer
-
-Remove AI writing patterns để text sound natural và human-written.
-
-**Activation Triggers:**
-- "humanize this text"
-- "make this sound more human"
-- "remove AI patterns"
-- "fix AI writing" / "this sounds like AI"
-- "make this less robotic" / "make it less ChatGPT"
-- "de-AI this" / "rewrite to sound natural"
-
-**Purpose:**
-Nhận diện và loại bỏ 24 AI writing patterns dựa trên Wikipedia's "Signs of AI writing" guide. Không chỉ clean patterns mà còn inject genuine personality.
-
-**Structure:**
-```
-.claude/skills/humanizer/
-├── SKILL.md                           # Main skill definition
-├── references/
-│   ├── ai-writing-patterns.md         # 24 documented patterns
-│   ├── personality-and-soul.md        # Personality injection guide
-│   └── wikipedia-source-guide.md      # Source reference
-└── examples/
-    ├── full-humanization.md           # Complete rewrite example
-    └── quick-fixes.md                 # Quick pattern fixes
-```
-
-**Chi tiết:** Xem `.claude/skills/humanizer/SKILL.md`
-
----
-
 ### lyra-prompt-optimizer
 
 (Đã document ở section Skills System phía trên)
@@ -1038,15 +1000,6 @@ cursor-pro-max/
 │       │   │   └── vietnamese-writing-style.md # Writing guidelines
 │       │   └── examples/
 │       │       └── sample-corrections.md       # 4 example scenarios
-│       ├── humanizer/
-│       │   ├── SKILL.md             # Remove AI writing patterns
-│       │   ├── references/          # AI patterns, personality guide
-│       │   │   ├── ai-writing-patterns.md
-│       │   │   ├── personality-and-soul.md
-│       │   │   └── wikipedia-source-guide.md
-│       │   └── examples/
-│       │       ├── full-humanization.md
-│       │       └── quick-fixes.md
 │       ├── lyra-prompt-optimizer/
 │       │   ├── SKILL.md             # Prompt optimization skill
 │       │   ├── references/          # Core documentation
@@ -1284,7 +1237,7 @@ MIT License - Xem [LICENSE](LICENSE) để biết chi tiết.
 - **[CLAUDE.md](CLAUDE.md)** - Project overview và key concepts
 - **[GLOBAL_RULE.md](GLOBAL_RULE.md)** - System prompt v2.0.0 (5,600 dòng)
 - **Commands**: Xem individual files trong `.cursor/commands/`
-- **Skills**: Xem `.claude/skills/` (6 skills: claudeception, grammar-learning, humanizer, lyra-prompt-optimizer, matrix-test-suite, uat-test-suite)
+- **Skills**: Xem `.claude/skills/` (5 skills: claudeception, grammar-learning, lyra-prompt-optimizer, matrix-test-suite, uat-test-suite)
 
 ### Repository
 

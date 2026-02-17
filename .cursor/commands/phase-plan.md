@@ -122,6 +122,28 @@ Before building the plan, classify the request complexity. This determines how m
 
 State your classification at the top of `Project Overview` as: `**Complexity**: Lightweight / Standard / Complex`
 
+### Step 2c: Feature Activation Matrix (v7.0 Dual-View System)
+
+The complexity classification determines which v7 optional features activate. Use this matrix to decide what to include:
+
+| Feature | Lightweight | Standard | Complex |
+|---------|-------------|----------|---------|
+| **Executive Summary** | Include (concise) | Include | Include |
+| **Dependency Graph** (mermaid) | Optional (3+ phases or non-linear deps) | Include | Include |
+| **Before/After Overview** | Include | Include | Include |
+| **Pseudocode Logic** (Dev View) | Skip (unless user requests) | Optional (critical phases only) | Include (all phases) |
+| **Reasoning Block** (Dev View) | Skip (unless user requests) | Optional (key decisions only) | Include (all decisions) |
+| **Learning Notes** | Skip | Optional | Include |
+| **Per-Phase Flow Diagram** | Skip (unless user requests) | Optional (critical phases only) | Include (all complex phases: 5+ todos) |
+| **Test Map** (AC↔Tests) | Skip | Optional (critical ACs) | Include (all phases) |
+| **Agent Handoff Notes** | Optional (when delegating) | Optional (risky phases) | Include (all phases) |
+
+**"Critical phase" heuristic for Standard plans:** A phase qualifies for Dev View features if ANY of:
+- Contains a todo with `Effort >= 2h`
+- Has external service dependencies (APIs, third-party services)
+- Tracker View shows at least one cross-phase dependency with `dep_type: blocks`
+- Phase has 5+ todos
+
 ### Step 3: Build the Phase Plan
 
 Create the number of phases determined by Step 2b (plus optional Phase 0).
@@ -138,6 +160,9 @@ Planning rules:
 Always output sections in this order:
 
 1. `## Project Overview`
+   - 1a. `### Executive Summary` (PM View, required for all complexity levels)
+   - 1b. `### Phase Dependency Graph` (PM View, required for Standard/Complex; optional for Lightweight when 3+ phases or non-linear dependencies)
+   - 1c. `### Before/After Overview` (PM View, required for all complexity levels)
 2. `## Phase 0` (only when spec gate fails or uncertainty is high)
 3. `## Phase 1..N`
 4. `### Issues (Tracker View)`
@@ -149,6 +174,7 @@ Always output sections in this order:
 - Change type
 - Key constraints
 - Assumptions
+- **Complexity**: Lightweight / Standard / Complex (added in v7.0)
 
 ### Step 4b: Approval Gate (Mandatory)
 
@@ -243,6 +269,165 @@ Examples:
 
 This format reduces ambiguity in acceptance criteria and makes them directly testable.
 
+### Step 5a: Optional v7 Blocks (Dual-View Features)
+
+The v7 Dual-View system adds 6 optional blocks to the phase format. Include these blocks based on complexity level (see Step 2c Feature Activation Matrix):
+
+#### Logic (Dev View) — TIER 2
+
+Add under complex todos (Effort >= 2h, Type: impl):
+
+```markdown
+   #### Logic (Dev View)
+
+   ```pseudo
+   [Pseudocode using one of these templates:]
+   - Service: VALIDATE -> AUTHN/AUTHZ -> LOAD -> LOGIC -> PERSIST -> EMIT -> RETURN
+   - Transform: FOR each item -> TRANSFORM -> APPEND -> RETURN output
+   - Aggregation: INIT accumulator -> FOR each item COMBINE -> RETURN accumulator
+   - Error handling: TRY main path -> CATCH expected -> graceful -> CATCH unexpected -> log/rethrow
+   ```
+```
+
+**When to include**: Standard (critical phases only), Complex (all phases)
+**Max length**: 15 lines per block
+
+#### Why This Approach — TIER 2
+
+Add after Logic block for key architectural decisions:
+
+```markdown
+   #### Why This Approach
+   **Decision:** [What was decided]
+   **Reasoning ([Deductive/Comparative/Causal/Risk-based]):**
+   - [Premise or factor 1]
+   - [Premise or factor 2]
+   - Conclusion: [Why this choice]
+   **Trade-off:** [What we give up]
+```
+
+**Reasoning frameworks**:
+- **Deductive**: Proving correctness from rules/invariants
+- **Comparative**: Selecting between options (tradeoffs)
+- **Causal**: Explaining cause-effect chains
+- **Risk-based**: Choosing safeguards/mitigations
+
+**When to include**: Standard (key decisions only), Complex (all decisions)
+
+#### Test Map (AC↔Tests) — TIER 2b
+
+Add after Acceptance Criteria for phases with tests:
+
+```markdown
+   #### Test Map
+   | AC | Test Todo | Verification Method |
+   |----|-----------|---------------------|
+   | AC1: [Description] | phase-X-Y | unit/integration/e2e/manual |
+   | AC2: [Description] | phase-X-Z | unit/integration/e2e/manual |
+```
+
+**Purpose**: Creates explicit bidirectional mapping between ACs and test todos
+**When to include**: Standard (critical ACs), Complex (all phases with tests)
+**Rule**: No orphan ACs (every AC needs a test), no orphan tests (every test serves an AC)
+
+#### Agent Handoff Notes — TIER 2b
+
+Add after Test Map for phases requiring agent execution:
+
+```markdown
+   #### Agent Handoff Notes
+   - **Entry point:** [File/function where work begins]
+   - **Prerequisite state:** [What must be true before starting]
+   - **Key files to read first:** [2-3 files to scan for patterns]
+   - **Gotchas:** [Non-obvious constraints]
+```
+
+**Purpose**: Bridges gap between plan-level knowledge and agent execution context
+**When to include**: Standard (risky phases), Complex (all phases with impl todos >= 4h effort)
+
+#### What You'll Learn — TIER 3
+
+Add before Stop Condition for educational value:
+
+```markdown
+   #### What You'll Learn From This Phase
+   - **Pattern:** [Design pattern or architecture pattern used]
+   - **Principle:** [Software principle applied, e.g., SRP, DRY]
+   - **Skill:** [Technical skill practiced]
+   - **Thinking mode:** [Optional: Logical/Analytical/Systems/Computational/etc.]
+```
+
+**When to include**: Complex only (phases with 5+ todos or effort >= 8h)
+
+#### Phase Flow — TIER 3
+
+Add before Stop Condition for complex multi-component phases:
+
+```markdown
+   #### Phase Flow
+
+   ```mermaid
+   [Use sequenceDiagram for data flow OR flowchart TD for decision logic]
+   ```
+```
+
+**Diagram selection**:
+- **sequenceDiagram**: For data flow between components (APIs, services, DB)
+- **flowchart TD**: For decision logic and branching conditions
+
+**When to include**: Complex only (phases with 5+ todos OR multi-component interaction)
+**Max length**: 15 lines per diagram
+
+---
+
+**Updated Phase Format Template (with optional blocks marked)**:
+
+```markdown
+## Phase X: [Name]
+
+**Objective**: [What and why]
+**Spec Trace**: [Source]
+
+### Todos
+1. [ ] [Phase X] [Task] (id: phase-X-1, ...)
+
+   #### Logic (Dev View) — OPTIONAL (Tier 2)
+   [Pseudocode if Effort >= 2h]
+
+   #### Why This Approach — OPTIONAL (Tier 2)
+   [Reasoning if key decision]
+
+2. [ ] [Phase X] [Task] (id: phase-X-2, ...)
+
+### Acceptance Criteria
+- AC1: [Testable condition]
+- AC2: [Testable condition]
+
+#### Test Map — OPTIONAL (Tier 2b)
+[AC↔Test mapping if phase has tests]
+
+### Risks & Assumptions
+- Risk: [Description] → Mitigation: [Action]
+
+### Feedback & Checks
+- Tests: [What to run]
+
+#### Agent Handoff Notes — OPTIONAL (Tier 2b)
+[Context for agent execution]
+
+#### What You'll Learn — OPTIONAL (Tier 3)
+[Pattern/Principle/Skill]
+
+#### Phase Flow — OPTIONAL (Tier 3)
+[Mermaid diagram for complex phases]
+
+### Stop Condition
+- [When complete]
+
+### Phase Completion Signal
+`PHASE_COMPLETE: [Name] | ACs: [...] | Rollback: yes/no`
+```
+
 ### Step 5b: Quality Reference -- Gold Standard Example
 
 Use the following as a quality benchmark. Every plan you produce should match or exceed this level of specificity.
@@ -258,6 +443,44 @@ Use the following as a quality benchmark. Every plan you produce should match or
 - **Change type**: New feature (enhancement to existing auth flow)
 - **Key constraints**: Must not break existing login flow; verification email must send within 5s; token expires after 24h
 - **Assumptions**: SMTP service (SendGrid) is already configured; existing `User` model can be extended
+- **Complexity**: Standard
+
+---
+
+### Executive Summary
+
+| Metric | Value |
+|--------|-------|
+| Total phases | 3 |
+| Total todos | 15 |
+| Estimated effort | 16.5h |
+| Critical path | P1 DB Model → P2 Email Service → P3 Verify Endpoint |
+| Risk level | Medium -- SendGrid external dependency |
+| Key decision | Token-based verification over magic link for simplicity |
+| Complexity | Standard |
+
+---
+
+### Phase Dependency Graph
+
+```mermaid
+flowchart LR
+    P1["P1: Database and Model"] --> P2["P2: Email Service"]
+    P1 --> P3["P3: Verify Endpoint"]
+    P2 --> P3
+```
+
+---
+
+### Before/After Overview
+
+| Aspect | Before | After |
+|--------|--------|-------|
+| Email verification | None -- any email can register | Full verify flow with 24h token expiry |
+| Protected routes | Login-only gating | Login + email-verified gating |
+| User model | users(id, email, password) | users(id, email, password, email_verified, verification_token, token_expires_at) |
+| Email capability | No transactional email | SendGrid integrated with HTML template |
+| Test coverage | Basic auth tests only | Unit + integration + e2e for full verify flow |
 
 ---
 
@@ -302,6 +525,39 @@ Use the following as a quality benchmark. Every plan you produce should match or
 
 ### Todos
 1. [ ] [Phase 2] Create `sendVerificationEmail(userId)` service function that generates token, saves to DB, and sends email via SendGrid with verification link `{BASE_URL}/verify?token={token}` (id: phase-2-1, Owner: Dev, Effort: 2h, Priority: P1, Type: impl)
+
+   #### Logic (Dev View)
+
+   ```pseudo
+   FUNCTION sendVerificationEmail(userId):
+     VALIDATE userId exists in database
+     LOAD user record from DB
+
+     GENERATE token = crypto.randomBytes(16).toString('hex')  // 32 chars
+     CALCULATE expiry = NOW() + 24 hours
+
+     PERSIST token and expiry to user record
+
+     BUILD email HTML from template with verify link
+     EMIT SendGrid API call with email payload
+
+     IF SendGrid fails THEN
+       LOG error with userId and retry context
+       THROW EmailDeliveryError
+     END IF
+
+     RETURN success
+   END FUNCTION
+   ```
+
+   #### Why This Approach
+   **Decision:** Use random hex token instead of JWT for verification link.
+   **Reasoning (Comparative):**
+   - Random token: single-use, server-stored, simple generation, no decode overhead
+   - JWT: multi-use, stateless, heavier, overkill for one-time verification
+   - Conclusion: Random hex is simpler and sufficient for single-use verification
+   **Trade-off:** Requires DB lookup per verification (acceptable -- happens once per user)
+
 2. [ ] [Phase 2] Integrate `sendVerificationEmail` call into existing signup controller `src/controllers/auth.ts#register`, called after successful user creation (id: phase-2-2, Owner: Dev, Effort: 1h, Priority: P1, Type: impl)
 3. [ ] [Phase 2] Create email HTML template `templates/verify-email.html` with verification button linking to `/verify?token={token}` (id: phase-2-3, Owner: Dev, Effort: 1h, Priority: P2, Type: impl)
 4. [ ] [Phase 2] Write integration test: register new user -> assert email sent via SendGrid mock -> assert token saved in DB with correct expiry (id: phase-2-4, Owner: Dev, Effort: 1.5h, Priority: P1, Type: test)
@@ -321,6 +577,28 @@ Use the following as a quality benchmark. Every plan you produce should match or
 - Tests: Integration tests with SendGrid mock, edge case for duplicate emails
 - Static checks: Lint, type check
 - Manual verification: Register test account, confirm email arrives with correct link
+
+#### What You'll Learn From This Phase
+- **Pattern:** Service extraction -- isolating email logic from controller
+- **Principle:** Single Responsibility -- sendVerificationEmail does one thing
+- **Skill:** Crypto token generation with cryptographically secure randomness
+
+#### Phase Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant API as SignupAPI
+    participant DB as Database
+    participant Email as SendGrid
+
+    U->>API: POST /register
+    API->>DB: Create user
+    API->>DB: Save token + expiry
+    API->>Email: Send verification email
+    Email-->>U: Email with verify link
+    API-->>U: 201 Created
+```
 
 ### Stop Condition
 - All integration tests pass, manual test confirms email receipt, existing signup e2e test still passes
@@ -348,6 +626,14 @@ Use the following as a quality benchmark. Every plan you produce should match or
 - AC3: Unverified users get 403 on all protected routes with clear error message
 - AC4: Already-verified users can click the link again without error (idempotent)
 
+#### Test Map
+| AC | Test Todo | Verification Method |
+|----|-----------|---------------------|
+| AC1: Valid token sets email_verified=true | phase-3-4 (valid token test) | Unit test |
+| AC2: Expired token returns 400 TOKEN_EXPIRED | phase-3-4 (expired token test) | Unit test |
+| AC3: Unverified users get 403 on protected routes | phase-3-5 (e2e full flow) | E2E test |
+| AC4: Already-verified idempotent | phase-3-4 (already-verified test) | Unit test |
+
 ### Risks & Assumptions
 - Risk: Users may not check email → Mitigation: Track as follow-up issue for "Resend verification" feature; add monitoring for verification completion rate
 - Assumption: Frontend will display the 403 response as a verification prompt UI
@@ -356,6 +642,12 @@ Use the following as a quality benchmark. Every plan you produce should match or
 - Tests: Unit tests for all 4 token states, e2e for full signup-verify-access flow
 - Static checks: Lint, type check, security scan for token handling (no timing attacks)
 - Manual verification: Walk through full signup -> verify -> access flow manually in staging
+
+#### Agent Handoff Notes
+- **Entry point:** `src/routes/auth.ts` -- add new GET /verify route here
+- **Prerequisite state:** Phase 2 complete -- sendVerificationEmail service exists and is tested
+- **Key files to read first:** `src/middleware/auth.ts` (existing auth patterns), `src/routes/index.ts` (route registration)
+- **Gotchas:** Token comparison must be timing-safe (use `crypto.timingSafeEqual`) to prevent timing attacks
 
 ### Stop Condition
 - All unit + e2e tests pass, manual walkthrough succeeds, no regressions in existing auth tests, security scan clean
@@ -413,6 +705,41 @@ Study these examples to avoid common quality failures. Never produce output matc
 | `Fix the bug` | Which bug? What is the expected vs actual behavior? | `Fix race condition in /api/checkout where concurrent requests can double-charge: add optimistic locking via version column on orders table, return 409 on version mismatch` |
 | `Improve performance` | No metric, no target, no scope | `Add Redis cache (TTL: 5min) for GET /api/products endpoint; target: reduce p95 latency from 800ms to under 200ms measured via existing Datadog dashboard` |
 
+### Step 5d: Dual-View Output Guidelines
+
+The v7 Dual-View architecture separates plan output into two perspectives:
+
+**PM View (Macro / Black-Box):**
+- **What**: Executive Summary, Dependency Graph, Before/After Overview
+- **Purpose**: See big picture at a glance without diving into implementation details
+- **Audience**: Product managers, stakeholders, high-level reviewers
+- **Output style**: Tables, diagrams, summaries -- no pseudocode or internals
+
+**Dev View (Micro / White-Box):**
+- **What**: Logic blocks, Reasoning blocks, Learning Notes, Phase Flow diagrams, Test Maps, Agent Handoff Notes
+- **Purpose**: Understand WHY decisions were made, WHAT logic is used, HOW to execute
+- **Audience**: Developers, coding agents, learners
+- **Output style**: Pseudocode, reasoning frameworks, technical details, execution context
+
+**View Activation by Complexity:**
+
+| Complexity | PM View | Dev View |
+|------------|---------|----------|
+| **Lightweight** | Concise PM View: Exec Summary + Before/After required; Dependency Graph optional (3+ phases or non-linear deps) | Off by default; optional deep-dive on 1 critical phase when user explicitly requests |
+| **Standard** | Full PM View (all 3 sections) | Selective -- Dev View for **critical phases only** (see "critical phase" heuristic in Step 2c) |
+| **Complex** | Full PM View (all 3 sections) | Full Dev View on **every phase** (all 6 optional blocks) |
+
+**Output Discipline:**
+- Lightweight plans: Keep concise. No bloat. PM View tells the story, Dev View only if explicitly requested or critical.
+- Standard plans: Balance. PM View always. Dev View for phases with high effort, external deps, or blocking dependencies.
+- Complex plans: Comprehensive. Full PM View + full Dev View. Education and agent-readiness are priorities.
+
+**When in doubt**:
+- If the phase has `Effort >= 2h` OR external service dependencies OR blocks other phases → include Dev View
+- If the user asks "why this approach?" → include Reasoning block
+- If a coding agent will execute → include Agent Handoff Notes
+- If the plan is for learning → include Learning Notes
+
 ### Step 6: Add Tracker View (Required)
 
 After all phases, output an issue-style tracker table:
@@ -455,8 +782,9 @@ If `Phase 0` exists, Phase 0 is the first active phase.
 
 Before presenting the plan, run FOUR verification passes:
 
-**Pass 1: Structural completeness**
+**Pass 1: Structural completeness + v7 Feature Validation**
 
+Existing v6 checks:
 - [ ] Spec gate passed or Phase 0 was included
 - [ ] Every todo is traceable to requirements/spec
 - [ ] Every phase has Acceptance Criteria and Stop Condition
@@ -466,6 +794,37 @@ Before presenting the plan, run FOUR verification passes:
 - [ ] Tracker rows include consistent `spec_ref` mappings back to `Spec Trace`
 - [ ] TodoWrite items were created with correct ID/status format
 - [ ] Every Risk has a `→ Mitigation:` action (no orphan risks)
+
+NEW v7 checks (PM View - Tier 1):
+- [ ] **Executive Summary present**: If complexity is Lightweight/Standard/Complex, Executive Summary table exists with all 7 metrics
+- [ ] **Executive Summary accuracy**: Total phases/todos counts match actual phase sections and Tracker View rows
+- [ ] **Dependency Graph validation**: If present, graph has exactly 1 node per phase (no phantoms, no missing); node IDs match P1, P2, ... PN
+- [ ] **Dependency Graph structure**: All edges represent real dependencies from Tracker View `depends_on` column; no circular dependencies
+- [ ] **Before/After completeness**: Every key capability from Spec Trace appears in Before/After table; no generic rows
+- [ ] **Before/After traceability**: After column describes outcomes from final phase; Before column matches assumptions
+
+NEW v7 checks (Dev View - Tier 2):
+- [ ] **Pseudocode presence**: For todos with Effort >= 2h AND Type: impl, Logic (Dev View) block present per complexity rules
+- [ ] **Pseudocode template usage**: Every pseudocode block uses one of 4 templates (Service/Transform/Aggregation/Error handling)
+- [ ] **Pseudocode length**: Each Logic block max 15 lines
+- [ ] **Reasoning block presence**: For key decisions (in Executive Summary), Why This Approach block present
+- [ ] **Reasoning framework**: Every reasoning block picks exactly one framework (Deductive/Comparative/Causal/Risk-based)
+- [ ] **Reasoning completeness**: Decision + Reasoning + Trade-off all present; no "TBD"
+
+NEW v7 checks (Learning - Tier 3):
+- [ ] **Learning Notes presence**: For Complex plans, phases with 5+ todos or Effort >= 8h have What You'll Learn
+- [ ] **Learning Notes structure**: Pattern + Principle + Skill present (Thinking mode optional)
+- [ ] **Phase Flow presence**: For Complex plans, phases with 5+ todos OR multi-component interaction have mermaid diagram
+- [ ] **Phase Flow type**: Uses sequenceDiagram for data flow OR flowchart TD for logic; no generic diagrams
+- [ ] **Phase Flow length**: Each diagram max 15 lines
+
+NEW v7 checks (Dev+Agent - Tier 2b):
+- [ ] **Test Map presence**: Phases with Type: test todos have Test Map table
+- [ ] **Test Map completeness**: Every AC in Acceptance Criteria appears in Test Map; every test todo appears in Test Map
+- [ ] **Test Map no orphans**: No orphan ACs (AC without test), no orphan tests (test without AC)
+- [ ] **Agent Handoff presence**: For phases with Type: impl AND Effort >= 4h, Agent Handoff Notes present per complexity
+- [ ] **Agent Handoff completeness**: Entry point + Prerequisite state + Key files + Gotchas all present
+- [ ] **Agent Handoff specificity**: Entry point references actual file/function; Gotchas describe non-obvious constraints
 
 **Pass 2: Todo Specificity Test (apply to EVERY todo)**
 
@@ -582,13 +941,14 @@ Plans do not always move forward linearly. When issues are discovered during exe
 ## Metadata
 
 **Command**: `/phase-plan`
-**Version**: 6.0.0
+**Version**: 7.0.0
 **Language**: English
 **Target Platform**: Claude (Anthropic) -- optimized with XML tags and Chain-of-Thought reasoning
 **Dependencies**: TodoWrite tool (required)
 **Mode**: Planning/specification output only
 **TCREI Optimization**: v4.0 -- Context (audience + quality bar), References (gold standard example + anti-patterns), Evaluate (4-point specificity test), Iterate (diagnostic guide)
 **Lyra Optimization**: v5.0 -- Chain-of-Thought reasoning directive, Input Extraction Protocol, Complexity Classifier, Chain-of-Verification (4-pass self-check), Claude-specific XML structure
+**Dual-View Architecture**: v7.0 -- PM View (Executive Summary, Dependency Graph, Before/After) + Dev View (Logic, Reasoning, Learning, Flow, Test Map, Handoff)
 
 ### Changelog v6.0
 
@@ -614,6 +974,45 @@ Plans do not always move forward linearly. When issues are discovered during exe
 | Added Approval Safety and Consistency to Design Principles | Review spec §7 |
 | Added Troubleshooting: Common Planning Stalls section | Review spec §7 |
 | **Excluded**: Recovery Plan, Error Recovery Protocol, Stuck detection | User decision -- prefers v5 simplicity |
+
+### Changelog v7.0
+
+| Change | Tier | Source |
+|--------|------|--------|
+| **Added Dual-View architecture (PM View + Dev View)** | Core | Phase Plan v7 Spec |
+| Added Executive Summary table to Output Contract (Step 4) | Tier 1 - PM View | Phase Plan v7 Spec |
+| Added Phase Dependency Graph (mermaid) to Output Contract | Tier 1 - PM View | Phase Plan v7 Spec |
+| Added Before/After Overview table to Output Contract | Tier 1 - PM View | Phase Plan v7 Spec |
+| Added Step 2c: Feature Activation Matrix (9 features × 3 complexity levels) | Core | Phase Plan v7 Spec |
+| Added Step 5a: Optional v7 Blocks (6 optional blocks description) | Core | Phase Plan v7 Spec |
+| Added Logic (Dev View) optional block to phase format | Tier 2 - Dev View | Phase Plan v7 Spec |
+| Added Why This Approach (Reasoning) optional block | Tier 2 - Dev View | Phase Plan v7 Spec |
+| Added Test Map (AC↔Tests) optional block | Tier 2b - Dev+Agent | Phase Plan v7 Spec |
+| Added Agent Handoff Notes optional block | Tier 2b - Dev+Agent | Phase Plan v7 Spec |
+| Added What You'll Learn (Learning Notes) optional block | Tier 3 - Learning | Phase Plan v7 Spec |
+| Added Phase Flow diagram optional block | Tier 3 - Learning | Phase Plan v7 Spec |
+| Added Step 5d: Dual-View Output Guidelines | Core | Phase Plan v7 Spec |
+| Extended Gold Standard Example with all 9 features (PM + Dev + Learning + Agent) | Core | Phase Plan v7 Spec |
+| Extended Step 8 Pass 1 with 28 v7 Feature Validation checks | Core | Phase Plan v7 Spec |
+| Added "Critical phase" heuristic for Standard plans (4 conditions) | Core | Phase Plan v7 Spec |
+| Added Pseudocode template palette (4 templates: Service/Transform/Aggregation/Error) | Tier 2 | Phase Plan v7 Spec |
+| Added Reasoning framework selection guide (4 core: Deductive/Comparative/Causal/Risk-based) | Tier 2 | Phase Plan v7 Spec |
+| Added Complexity field to Project Overview | Core | Phase Plan v7 Spec |
+| Updated Phase format template with 6 optional blocks placement | Core | Phase Plan v7 Spec |
+
+**Migration from v6 to v7:**
+- All v6 plans remain valid (backward compatible)
+- New plans include PM View features by default (Executive Summary, Before/After; Graph optional for Lightweight)
+- Dev View features activate based on complexity (Standard: selective, Complex: full)
+- No breaking changes to existing v6 structure
+- File size increased ~240 lines (v6: 623 lines → v7: ~863 lines, +38%)
+
+**Design Principles v7:**
+- **Progressive Disclosure**: Features activate by complexity (Lightweight → Standard → Complex)
+- **Dual-View Separation**: PM View (macro/black-box) vs Dev View (micro/white-box)
+- **Agent-Ready**: Agent Handoff Notes bridge plan↔execution context gap
+- **Test Traceability**: Test Map ensures bidirectional AC↔Test mapping
+- **Learning-Focused**: Learning Notes explain patterns/principles/skills
 
 ## Related Commands
 

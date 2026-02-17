@@ -22,8 +22,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   ├── create-command.md # Meta-command generator
 │   ├── check-grammar.md  # Grammar checking
 │   ├── generate-agents.md # Generate AGENTS.md hierarchy
-│   ├── generate-claude.md # Generate CLAUDE.md hierarchy
-│   └── dev-dao-architecture.md # Thiết kế kiến trúc với Binh Pháp Tôn Tử
+│   └── generate-claude.md # Generate CLAUDE.md hierarchy
 │
 └── rules/              # Cursor rules (.mdc files)
     └── optimization-principles.mdc # LEVER framework for code optimization
@@ -36,10 +35,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
     │   ├── examples/
     │   └── scripts/
     ├── grammar-learning/       # Grammar correction skill
-    │   ├── SKILL.md
-    │   ├── references/
-    │   └── examples/
-    ├── humanizer/              # Remove AI writing patterns
     │   ├── SKILL.md
     │   ├── references/
     │   └── examples/
@@ -60,12 +55,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
     │   ├── examples/
     │   ├── scripts/
     │   └── templates/
-    └── dev-dao/                # Đạo Coding — Triết học Đông phương cho software engineering
-        ├── SKILL.md
-        ├── references/
-        ├── examples/
-        └── templates/
-
 GLOBAL_RULE.md          # System prompt chính (~5600 lines) cho AI agents
 ```
 

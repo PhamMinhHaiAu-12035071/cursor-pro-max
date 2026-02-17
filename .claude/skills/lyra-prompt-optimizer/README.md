@@ -764,7 +764,6 @@ lyra-prompt-optimizer/
 
 ### Related Skills
 - **`grammar-learning`** - Fix English grammar (pairs well with prompt clarity)
-- **`humanizer`** - Remove AI patterns from text
 - **`claudeception`** - Extract reusable knowledge from sessions
 
 ### Workflow Integration
@@ -919,7 +918,7 @@ While this skill is part of the `cursor-pro-max` project, contributions are welc
 
 ### Within cursor-pro-max
 - **Commands**: Use `/interview`, `/council`, `/create-command` with Lyra
-- **Skills**: Combine with `grammar-learning`, `humanizer`, `claudeception`
+- **Skills**: Combine with `grammar-learning`, `claudeception`
 - **Documentation**: See [CLAUDE.md](../../CLAUDE.md) for project context
 
 ### External Resources
