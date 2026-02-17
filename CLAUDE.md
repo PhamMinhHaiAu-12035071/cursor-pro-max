@@ -55,7 +55,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
     │   ├── examples/
     │   ├── scripts/
     │   └── templates/
-GLOBAL_RULE.md          # System prompt chính (~5600 lines) cho AI agents
+GLOBAL_RULE.md          # System prompt chính (~1200 lines) cho AI agents
 ```
 
 ## Key Concepts

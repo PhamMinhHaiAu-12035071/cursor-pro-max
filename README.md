@@ -130,7 +130,7 @@ Rules system cho phép apply coding standards tự động khi mở files matchi
 
 ### System Prompt (GLOBAL_RULE.md v2.0.0)
 
-- Production-ready system prompt (~5,600 dòng)
+- Production-ready system prompt (~1,200 dòng)
 - Task classification: 🟢 Lightweight, 🟡 Standard, 🔴 Critical
 - Performance budgets: Token limits và time constraints
 - Conflict resolution hierarchy
@@ -196,7 +196,7 @@ Installs cursor-pro-max vào target directory với interactive conflict resolut
 - `.cursor/commands/` - 8 slash commands
 - `.cursor/rules/` - 1 rule (optimization-principles.mdc)
 - `.claude/skills/` - 5 AI skills (claudeception, grammar-learning, lyra-prompt-optimizer, matrix-test-suite, uat-test-suite)
-- `GLOBAL_RULE.md` - System prompt (~5,600 lines)
+- `GLOBAL_RULE.md` - System prompt (~1,200 lines)
 
 **Conflict Resolution:**
 
@@ -407,7 +407,7 @@ find .cursor/commands -name "*.md" | wc -l
 ls -d .claude/skills/*/ | wc -l
 
 # Check GLOBAL_RULE.md size
-wc -l GLOBAL_RULE.md  # Should be ~5,600 lines
+wc -l GLOBAL_RULE.md  # Should be ~1,200 lines
 ```
 
 ### Template-based Installation (Manual)
@@ -1044,7 +1044,7 @@ cursor-pro-max/
 │           └── templates/
 │               └── uat-output-template.md
 │
-├── GLOBAL_RULE.md                   # System prompt (5,600 dòng, v2.0.0)
+├── GLOBAL_RULE.md                   # System prompt (~1,200 dòng, v2.0.0)
 ├── CLAUDE.md                        # Project documentation
 ├── README.md                        # File này
 └── LICENSE                          # MIT License
@@ -1235,7 +1235,7 @@ MIT License - Xem [LICENSE](LICENSE) để biết chi tiết.
 ### Documentation
 
 - **[CLAUDE.md](CLAUDE.md)** - Project overview và key concepts
-- **[GLOBAL_RULE.md](GLOBAL_RULE.md)** - System prompt v2.0.0 (5,600 dòng)
+- **[GLOBAL_RULE.md](GLOBAL_RULE.md)** - System prompt v2.0.0 (~1,200 dòng)
 - **Commands**: Xem individual files trong `.cursor/commands/`
 - **Skills**: Xem `.claude/skills/` (5 skills: claudeception, grammar-learning, lyra-prompt-optimizer, matrix-test-suite, uat-test-suite)
 
