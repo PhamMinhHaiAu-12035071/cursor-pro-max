@@ -27,7 +27,7 @@ Project này được thiết kế để:
 
 ## Tính Năng Chính
 
-### Commands System (8 slash commands)
+### Commands System (9 slash commands)
 
 Commands là các workflow có thể gọi bằng `/command-name`:
 
@@ -62,6 +62,12 @@ Commands là các workflow có thể gọi bằng `/command-name`:
   - Hướng dẫn tạo Cursor rules
   - Educational guide với examples
   - Phân biệt Commands vs Rules
+
+- **`/google-engineer`** (75 dòng, Simple)
+  - Google senior engineer mindset installer
+  - 5-Phase Protocol: TRACE → HISTORICIZE → INTERROGATE → ROOT-CAUSE → OWN IT
+  - Depth-first reasoning: trace code before touching it
+  - Structured output with "What I'd Check Next" section
 
 - **`/generate-agents`** (~280 dòng, Advanced)
   - Generate hierarchical AGENTS.md structure for any codebase
@@ -193,7 +199,7 @@ Installs cursor-pro-max vào target directory với interactive conflict resolut
 ```
 
 **What Gets Installed:**
-- `.cursor/commands/` - 8 slash commands
+- `.cursor/commands/` - 9 slash commands
 - `.cursor/rules/` - 1 rule (optimization-principles.mdc)
 - `.claude/skills/` - 5 AI skills (claudeception, grammar-learning, lyra-prompt-optimizer, matrix-test-suite, uat-test-suite)
 - `GLOBAL_RULE.md` - System prompt (~1,200 lines)
@@ -534,6 +540,7 @@ Dưới đây là danh sách đầy đủ các commands với mô tả:
 | `/phase-plan` | Simple | 11 | Phased work organization | Break work thành phases cho teams |
 | `/create-command` | Advanced | 870 | Meta-command generator | Tạo slash commands mới |
 | `/create-rule` | Advanced | 1,367 | Rule creation guide | Học cách tạo Cursor rules |
+| `/google-engineer` | Simple | 75 | Google senior engineer mindset | Depth-first reasoning cho coding tasks |
 | `/generate-agents` | Advanced | ~280 | Generate AGENTS.md hierarchy | Create agent guidance for any codebase |
 | `/generate-claude` | Advanced | ~390 | Generate CLAUDE.md hierarchy | Create Claude Code configuration |
 
@@ -659,6 +666,31 @@ Educational guide để học cách tạo Cursor rules.
 - Troubleshooting
 
 **Chi tiết:** Xem `.cursor/commands/create-rule.md`
+
+---
+
+### `/google-engineer` - Google Senior Engineer Mindset
+
+**Input format:**
+```
+/google-engineer
+
+[Any coding task: bug fix, feature, refactor, code review]
+```
+
+**5-Phase Protocol:**
+1. **TRACE** — Read every relevant line before touching anything
+2. **HISTORICIZE** — Ask why code was written this way (git history, design intent)
+3. **INTERROGATE** — Trust nothing you haven't verified (flag unknown dependencies)
+4. **ROOT-CAUSE** — Fix the origin, not the symptom
+5. **OWN IT** — Ship nothing you can't explain line by line
+
+**Output Structure:**
+Understanding → Trace → Historical WHY → Dependency Check → Root Cause → Solution → Risks → What I'd Check Next
+
+**Use case:** Khi muốn AI approach coding tasks với depth-first reasoning thay vì jump-to-solution.
+
+**Chi tiết:** Xem `.cursor/commands/google-engineer.md`
 
 ---
 
@@ -978,6 +1010,7 @@ cursor-pro-max/
 │   │   ├── create-rule.md           # Rule creation guide (1,367 dòng)
 │   │   ├── interview.md             # Requirements gathering (1,074 dòng)
 │   │   ├── phase-plan.md            # Phased work (11 dòng)
+│   │   ├── google-engineer.md       # Google engineer mindset (75 dòng)
 │   │   ├── generate-agents.md       # Generate AGENTS.md hierarchy (~280 dòng)
 │   │   └── generate-claude.md       # Generate CLAUDE.md hierarchy (~390 dòng)
 │   │

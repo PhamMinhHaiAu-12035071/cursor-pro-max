@@ -21,6 +21,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   ├── create-rule.md  # Hướng dẫn tạo Cursor rules
 │   ├── create-command.md # Meta-command generator
 │   ├── check-grammar.md  # Grammar checking
+│   ├── google-engineer.md # Google senior engineer mindset
 │   ├── generate-agents.md # Generate AGENTS.md hierarchy
 │   └── generate-claude.md # Generate CLAUDE.md hierarchy
 │

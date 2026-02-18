@@ -1,4 +1,87 @@
-# Phase Plan++ - Spec-Driven Phases With Todo Checklists
+# Phase Plan v8.0 -- Engineer Mode: Spec-Driven Phases With Full Reasoning and Visualization
+
+## Table of Contents
+
+- [Quick Start (TL;DR)](#quick-start-tldr)
+- [When to Use / When to Skip](#when-to-use--when-to-skip)
+- [Who This Plan Serves](#who-this-plan-serves)
+- [Core Goal](#core-goal)
+- [Process](#process)
+  - [Step 1: Understand Scope](#step-1-understand-scope-and-determine-planning-mode)
+  - [Step 1b: Extract Input Entities](#step-1b-extract-input-entities-mandatory----prevents-context-loss)
+  - [Step 2: Spec Gate](#step-2-run-the-spec-gate-mandatory)
+  - [Step 2b: Classify Complexity](#step-2b-classify-request-complexity-effort-estimation)
+  - [Step 2c: Feature Activation Matrix](#step-2c-feature-activation-matrix-v80-all-mandatory)
+  - [Step 3: Build Phase Plan](#step-3-build-the-phase-plan)
+  - [Step 4: Output Contract](#step-4-output-contract-required)
+  - [Step 4b: Approval Gate](#step-4b-approval-gate-mandatory)
+  - [Step 5: Phase Format](#step-5-write-each-phase-using-strict-format)
+  - [Step 5a: Mandatory Blocks](#step-5a-mandatory-blocks-engineer-mode-features)
+  - [Step 5b: Gold Standard Example](#step-5b-quality-reference----gold-standard-example)
+  - [Step 5c: Anti-Patterns](#step-5c-anti-patterns----what-bad-todos-look-like)
+  - [Step 5d: Dual-View Guidelines](#step-5d-dual-view-output-guidelines)
+  - [Step 6: Tracker View](#step-6-add-tracker-view-required)
+  - [Step 7: TodoWrite](#step-7-create-trackable-todos-in-ide-required)
+  - [Step 8: Self-Check](#step-8-self-check-before-output-non-negotiable)
+- [Execution Safety Principles](#execution-safety-principles)
+- [Iteration Guide](#iteration-guide-when-the-plan-needs-improvement)
+- [Design Principles](#design-principles)
+- [Troubleshooting](#troubleshooting-common-planning-stalls)
+- [Metadata](#metadata)
+
+---
+
+## Quick Start (TL;DR)
+
+**Phase Plan v8.0 "Engineer Mode"** produces transparent, fully-reasoned, visualization-rich phase plans. Every plan includes pseudocode, reasoning, learning notes, and mermaid diagrams -- regardless of complexity.
+
+**5-Step Process:**
+
+1. **Scope** -- Read request, extract entities, identify constraints
+2. **Gate** -- Validate spec quality, classify complexity for effort estimation
+3. **Plan** -- Build phases with ALL mandatory features (pseudocode, reasoning, diagrams, learning)
+4. **Verify** -- Run 4-pass self-check for completeness
+5. **Track** -- Create TodoWrite items after user approval
+
+```mermaid
+flowchart LR
+    S1["1. Scope\nRead & Extract"] --> S2["2. Gate\nSpec + Classify"]
+    S2 --> S3["3. Plan\nPhases + All Features"]
+    S3 --> S4["4. Verify\n4-Pass Self-Check"]
+    S4 --> S5["5. Track\nApproval → TodoWrite"]
+
+    style S1 fill:#e1f5fe
+    style S2 fill:#f3e5f5
+    style S3 fill:#e8f5e9
+    style S4 fill:#fff3e0
+    style S5 fill:#fce4ec
+```
+
+**Key v8 change:** All features are MANDATORY for every plan. No complexity-based gating. Every phase gets pseudocode (GIVEN/WHEN/THEN), reasoning (with Lesson Learned), learning notes, and at least 1 mermaid diagram.
+
+---
+
+## When to Use / When to Skip
+
+**Use Phase Plan when:**
+
+- [ ] Task has 2+ distinct implementation steps
+- [ ] Multiple files or components are affected
+- [ ] Task involves dependencies between steps
+- [ ] Stakeholders need a reviewable plan before execution
+- [ ] A coding agent will execute the work (handoff context needed)
+- [ ] You want reasoning transparency and learning value from the plan
+
+**Skip Phase Plan when:**
+
+- [ ] Single-file bug fix with obvious solution (just fix it)
+- [ ] Config change or env variable update (just do it)
+- [ ] Quick rename/refactor with no behavioral change
+- [ ] User explicitly says "just do it" or "skip planning"
+
+**Rule of thumb:** If the task takes >30 minutes or touches >3 files, use Phase Plan.
+
+---
 
 You are a technical project planner working in a spec-driven workflow.
 
@@ -102,9 +185,9 @@ Examples of valid spec sources:
 - `openspec/changes/<change-id>/proposal.md`, `design.md`, `tasks.md`
 - Ticket/issue references plus inline task context
 
-### Step 2b: Classify Request Complexity (Adapts Plan Structure)
+### Step 2b: Classify Request Complexity (Effort Estimation)
 
-Before building the plan, classify the request complexity. This determines how many phases, how much detail, and whether Phase 0 is mandatory.
+Before building the plan, classify the request complexity. This determines **phase count and effort estimation only**. Complexity classification does **NOT** gate features. All features are mandatory regardless of classification.
 
 | Signal | Lightweight | Standard | Complex |
 |---|---|---|---|
@@ -114,35 +197,33 @@ Before building the plan, classify the request complexity. This determines how m
 | Change type | Bug fix, config change, small feature | Feature, moderate refactor | Architecture change, migration, new system |
 | Risk level | Low -- easily reversible | Medium -- testable | High -- data migration, security, breaking changes |
 
-**Classification determines plan shape:**
+**Classification determines plan shape (phase count and effort only):**
 
-- **Lightweight** (2-3 phases): Skip Phase 0 unless ambiguous. Shorter acceptance criteria. Fewer todos per phase (3-4). Suitable for bug fixes, small features, config changes.
-- **Standard** (3-5 phases): Full format. Include Phase 0 if spec gate fails. 3-6 todos per phase. Suitable for most features and refactors.
+- **Lightweight** (2-3 phases): Skip Phase 0 unless ambiguous. Fewer todos per phase (3-4). Suitable for bug fixes, small features, config changes.
+- **Standard** (3-5 phases): Include Phase 0 if spec gate fails. 3-6 todos per phase. Suitable for most features and refactors.
 - **Complex** (5-7 phases): Phase 0 is mandatory even if spec seems clear. Include dedicated testing phase and deployment/rollback phase. 5-7 todos per phase. Suitable for architecture changes, migrations, new systems.
+
+**Important:** All v8 features (pseudocode, reasoning, learning notes, diagrams, test maps, etc.) are included in EVERY plan regardless of classification. See Step 2c.
 
 State your classification at the top of `Project Overview` as: `**Complexity**: Lightweight / Standard / Complex`
 
-### Step 2c: Feature Activation Matrix (v7.0 Dual-View System)
+### Step 2c: Feature Activation Matrix (v8.0 All Mandatory)
 
-The complexity classification determines which v7 optional features activate. Use this matrix to decide what to include:
+In v8.0 "Engineer Mode", ALL features are mandatory for every plan regardless of complexity. No feature gating, no optional markers, no tier labels.
 
-| Feature | Lightweight | Standard | Complex |
-|---------|-------------|----------|---------|
-| **Executive Summary** | Include (concise) | Include | Include |
-| **Dependency Graph** (mermaid) | Optional (3+ phases or non-linear deps) | Include | Include |
-| **Before/After Overview** | Include | Include | Include |
-| **Pseudocode Logic** (Dev View) | Skip (unless user requests) | Optional (critical phases only) | Include (all phases) |
-| **Reasoning Block** (Dev View) | Skip (unless user requests) | Optional (key decisions only) | Include (all decisions) |
-| **Learning Notes** | Skip | Optional | Include |
-| **Per-Phase Flow Diagram** | Skip (unless user requests) | Optional (critical phases only) | Include (all complex phases: 5+ todos) |
-| **Test Map** (AC↔Tests) | Skip | Optional (critical ACs) | Include (all phases) |
-| **Agent Handoff Notes** | Optional (when delegating) | Optional (risky phases) | Include (all phases) |
-
-**"Critical phase" heuristic for Standard plans:** A phase qualifies for Dev View features if ANY of:
-- Contains a todo with `Effort >= 2h`
-- Has external service dependencies (APIs, third-party services)
-- Tracker View shows at least one cross-phase dependency with `dep_type: blocks`
-- Phase has 5+ todos
+| Feature | All Plans |
+|---------|-----------|
+| **Executive Summary** | MANDATORY |
+| **Dependency Graph** (mermaid) | MANDATORY |
+| **Gantt Timeline** (mermaid) | MANDATORY |
+| **Before/After Overview** (3 aspects: Capability + Architecture + Data Model) | MANDATORY |
+| **Risk Summary** | MANDATORY |
+| **Pseudocode** (GIVEN/WHEN/THEN) | MANDATORY (every phase) |
+| **Reasoning Block** (with Lesson Learned) | MANDATORY (every phase) |
+| **Learning Notes** (Pattern + Principle + Skill) | MANDATORY (every phase) |
+| **Per-Phase Flow Diagram** (mermaid, min 1 per phase) | MANDATORY |
+| **Test Map** (AC↔Tests) | MANDATORY (every phase with tests) |
+| **Agent Handoff Notes** | MANDATORY (every phase with impl todos) |
 
 ### Step 3: Build the Phase Plan
 
@@ -160,9 +241,11 @@ Planning rules:
 Always output sections in this order:
 
 1. `## Project Overview`
-   - 1a. `### Executive Summary` (PM View, required for all complexity levels)
-   - 1b. `### Phase Dependency Graph` (PM View, required for Standard/Complex; optional for Lightweight when 3+ phases or non-linear dependencies)
-   - 1c. `### Before/After Overview` (PM View, required for all complexity levels)
+   - 1a. `### Executive Summary` (PM View -- MANDATORY)
+   - 1b. `### Phase Dependency Graph` (PM View -- MANDATORY, mermaid flowchart)
+   - 1c. `### Before/After Overview` (PM View -- MANDATORY, 3 aspects: Capability + Architecture + Data Model)
+   - 1d. `### Gantt Timeline` (PM View -- MANDATORY, mermaid gantt showing phases, dependencies, effort)
+   - 1e. `### Risk Summary` (PM View -- MANDATORY, table: Risk | Impact | Likelihood | Mitigation)
 2. `## Phase 0` (only when spec gate fails or uncertainty is high)
 3. `## Phase 1..N`
 4. `### Issues (Tracker View)`
@@ -174,7 +257,7 @@ Always output sections in this order:
 - Change type
 - Key constraints
 - Assumptions
-- **Complexity**: Lightweight / Standard / Complex (added in v7.0)
+- **Complexity**: Lightweight / Standard / Complex (for effort estimation)
 
 ### Step 4b: Approval Gate (Mandatory)
 
@@ -269,41 +352,61 @@ Examples:
 
 This format reduces ambiguity in acceptance criteria and makes them directly testable.
 
-### Step 5a: Optional v7 Blocks (Dual-View Features)
+### Step 5a: Mandatory Blocks (Engineer Mode Features)
 
-The v7 Dual-View system adds 6 optional blocks to the phase format. Include these blocks based on complexity level (see Step 2c Feature Activation Matrix):
+v8.0 "Engineer Mode" makes ALL blocks mandatory for every phase. No tier labels, no complexity gating. Every phase gets full reasoning, pseudocode, learning, and visualization.
 
-#### Logic (Dev View) — TIER 2
+#### Logic (Dev View) -- MANDATORY
 
-Add under complex todos (Effort >= 2h, Type: impl):
+Add under every todo with Type: impl. Use GIVEN/WHEN/THEN pseudocode format:
 
 ```markdown
    #### Logic (Dev View)
 
    ```pseudo
-   [Pseudocode using one of these templates:]
-   - Service: VALIDATE -> AUTHN/AUTHZ -> LOAD -> LOGIC -> PERSIST -> EMIT -> RETURN
-   - Transform: FOR each item -> TRANSFORM -> APPEND -> RETURN output
-   - Aggregation: INIT accumulator -> FOR each item COMBINE -> RETURN accumulator
-   - Error handling: TRY main path -> CATCH expected -> graceful -> CATCH unexpected -> log/rethrow
+   [Use one of these 4 GIVEN/WHEN/THEN templates:]
+
+   Service Flow:
+   GIVEN request received with [input parameters]
+   WHEN [validation passes] AND [authorization confirmed]
+   THEN [load data] → [apply business logic] → [persist result] → [return response]
+
+   User Interaction:
+   GIVEN user on [page/screen] with [current state]
+   WHEN user [performs action]
+   THEN system [responds with behavior] AND [updates state]
+
+   Data Transform:
+   GIVEN [input data] in [source format]
+   WHEN [transformation rules] applied
+   THEN [output data] produced in [target format] AND [side effects if any]
+
+   Error Handling:
+   GIVEN [operation] attempted with [conditions]
+   WHEN [failure type] occurs
+   THEN [handle gracefully] → [notify/log] → [return safe state]
    ```
 ```
 
-**When to include**: Standard (critical phases only), Complex (all phases)
-**Max length**: 15 lines per block
+**MANDATORY** for every phase.
+**Max length**: 15 lines per block.
 
-#### Why This Approach — TIER 2
+#### Why This Approach -- MANDATORY
 
-Add after Logic block for key architectural decisions:
+Add after Logic block for the phase's key decision:
 
 ```markdown
    #### Why This Approach
    **Decision:** [What was decided]
+   **Alternatives Considered:**
+   - [Option A] -- [why rejected]
+   - [Option B] -- [why rejected]
    **Reasoning ([Deductive/Comparative/Causal/Risk-based]):**
    - [Premise or factor 1]
    - [Premise or factor 2]
    - Conclusion: [Why this choice]
    **Trade-off:** [What we give up]
+   **Lesson Learned:** [Reusable insight for future decisions]
 ```
 
 **Reasoning frameworks**:
@@ -312,11 +415,11 @@ Add after Logic block for key architectural decisions:
 - **Causal**: Explaining cause-effect chains
 - **Risk-based**: Choosing safeguards/mitigations
 
-**When to include**: Standard (key decisions only), Complex (all decisions)
+**MANDATORY** for every phase -- expose reasoning for the phase's most important decision.
 
-#### Test Map (AC↔Tests) — TIER 2b
+#### Test Map (AC↔Tests) -- MANDATORY
 
-Add after Acceptance Criteria for phases with tests:
+Add after Acceptance Criteria for every phase:
 
 ```markdown
    #### Test Map
@@ -326,13 +429,13 @@ Add after Acceptance Criteria for phases with tests:
    | AC2: [Description] | phase-X-Z | unit/integration/e2e/manual |
 ```
 
-**Purpose**: Creates explicit bidirectional mapping between ACs and test todos
-**When to include**: Standard (critical ACs), Complex (all phases with tests)
-**Rule**: No orphan ACs (every AC needs a test), no orphan tests (every test serves an AC)
+**Purpose**: Creates explicit bidirectional mapping between ACs and test todos.
+**MANDATORY** for every phase with test todos.
+**Rule**: No orphan ACs (every AC needs a test), no orphan tests (every test serves an AC).
 
-#### Agent Handoff Notes — TIER 2b
+#### Agent Handoff Notes -- MANDATORY
 
-Add after Test Map for phases requiring agent execution:
+Add after Test Map for phases with implementation todos:
 
 ```markdown
    #### Agent Handoff Notes
@@ -342,10 +445,10 @@ Add after Test Map for phases requiring agent execution:
    - **Gotchas:** [Non-obvious constraints]
 ```
 
-**Purpose**: Bridges gap between plan-level knowledge and agent execution context
-**When to include**: Standard (risky phases), Complex (all phases with impl todos >= 4h effort)
+**Purpose**: Bridges gap between plan-level knowledge and agent execution context.
+**MANDATORY** for every phase with impl todos.
 
-#### What You'll Learn — TIER 3
+#### What You'll Learn From This Phase -- MANDATORY
 
 Add before Stop Condition for educational value:
 
@@ -357,30 +460,30 @@ Add before Stop Condition for educational value:
    - **Thinking mode:** [Optional: Logical/Analytical/Systems/Computational/etc.]
 ```
 
-**When to include**: Complex only (phases with 5+ todos or effort >= 8h)
+**MANDATORY** for every phase.
 
-#### Phase Flow — TIER 3
+#### Phase Flow -- MANDATORY
 
-Add before Stop Condition for complex multi-component phases:
+Add before Stop Condition. Every phase MUST have at least 1 mermaid diagram. AI selects the most appropriate type:
 
 ```markdown
    #### Phase Flow
 
    ```mermaid
-   [Use sequenceDiagram for data flow OR flowchart TD for decision logic]
+   [AI selects best diagram type for this phase:]
+   - sequenceDiagram: for data flow between components (APIs, services, DB)
+   - flowchart TD: for decision logic and branching conditions
+   - stateDiagram-v2: for state lifecycle and transitions
+   - other type as fits the phase content
    ```
 ```
 
-**Diagram selection**:
-- **sequenceDiagram**: For data flow between components (APIs, services, DB)
-- **flowchart TD**: For decision logic and branching conditions
-
-**When to include**: Complex only (phases with 5+ todos OR multi-component interaction)
-**Max length**: 15 lines per diagram
+**MANDATORY** for every phase (min 1 mermaid diagram per phase).
+**Max length**: 15 lines per diagram.
 
 ---
 
-**Updated Phase Format Template (with optional blocks marked)**:
+**Phase Format Template (all blocks MANDATORY)**:
 
 ```markdown
 ## Phase X: [Name]
@@ -391,11 +494,19 @@ Add before Stop Condition for complex multi-component phases:
 ### Todos
 1. [ ] [Phase X] [Task] (id: phase-X-1, ...)
 
-   #### Logic (Dev View) — OPTIONAL (Tier 2)
-   [Pseudocode if Effort >= 2h]
+   #### Logic (Dev View)
+   ```pseudo
+   GIVEN [context]
+   WHEN [trigger]
+   THEN [outcome]
+   ```
 
-   #### Why This Approach — OPTIONAL (Tier 2)
-   [Reasoning if key decision]
+   #### Why This Approach
+   **Decision:** [What]
+   **Alternatives Considered:** [Options rejected and why]
+   **Reasoning ([Framework]):** [Logic chain]
+   **Trade-off:** [What we give up]
+   **Lesson Learned:** [Reusable insight]
 
 2. [ ] [Phase X] [Task] (id: phase-X-2, ...)
 
@@ -403,8 +514,10 @@ Add before Stop Condition for complex multi-component phases:
 - AC1: [Testable condition]
 - AC2: [Testable condition]
 
-#### Test Map — OPTIONAL (Tier 2b)
-[AC↔Test mapping if phase has tests]
+#### Test Map
+| AC | Test Todo | Verification Method |
+|----|-----------|---------------------|
+| AC1 | phase-X-Y | unit/integration/e2e/manual |
 
 ### Risks & Assumptions
 - Risk: [Description] → Mitigation: [Action]
@@ -412,14 +525,22 @@ Add before Stop Condition for complex multi-component phases:
 ### Feedback & Checks
 - Tests: [What to run]
 
-#### Agent Handoff Notes — OPTIONAL (Tier 2b)
-[Context for agent execution]
+#### Agent Handoff Notes
+- **Entry point:** [File/function]
+- **Prerequisite state:** [What must be true]
+- **Key files to read first:** [Files]
+- **Gotchas:** [Non-obvious constraints]
 
-#### What You'll Learn — OPTIONAL (Tier 3)
-[Pattern/Principle/Skill]
+#### What You'll Learn From This Phase
+- **Pattern:** [Design pattern]
+- **Principle:** [Software principle]
+- **Skill:** [Technical skill]
 
-#### Phase Flow — OPTIONAL (Tier 3)
-[Mermaid diagram for complex phases]
+#### Phase Flow
+
+```mermaid
+[Diagram: sequenceDiagram / flowchart TD / stateDiagram-v2]
+```
 
 ### Stop Condition
 - [When complete]
@@ -430,10 +551,10 @@ Add before Stop Condition for complex multi-component phases:
 
 ### Step 5b: Quality Reference -- Gold Standard Example
 
-Use the following as a quality benchmark. Every plan you produce should match or exceed this level of specificity.
+Use the following as a quality benchmark. Every plan you produce should match or exceed this level of specificity. Notice that **every phase** includes ALL mandatory blocks: Logic (GIVEN/WHEN/THEN), Reasoning (with Lesson Learned), Learning Notes, Phase Flow diagram, Test Map, and Agent Handoff Notes.
 
 <example_plan title="Gold Standard Example -- Add user email verification to signup flow">
-<!-- Claude processes XML-tagged examples more reliably than HTML details tags. This example defines the minimum quality bar. -->
+<!-- Claude processes XML-tagged examples more reliably than HTML details tags. This example defines the minimum quality bar for v8.0 Engineer Mode. -->
 
 ```markdown
 ## Project Overview
@@ -443,7 +564,7 @@ Use the following as a quality benchmark. Every plan you produce should match or
 - **Change type**: New feature (enhancement to existing auth flow)
 - **Key constraints**: Must not break existing login flow; verification email must send within 5s; token expires after 24h
 - **Assumptions**: SMTP service (SendGrid) is already configured; existing `User` model can be extended
-- **Complexity**: Standard
+- **Complexity**: Standard (for effort estimation; all features included per v8 Engineer Mode)
 
 ---
 
@@ -476,11 +597,50 @@ flowchart LR
 
 | Aspect | Before | After |
 |--------|--------|-------|
+| **Capability** | | |
 | Email verification | None -- any email can register | Full verify flow with 24h token expiry |
 | Protected routes | Login-only gating | Login + email-verified gating |
-| User model | users(id, email, password) | users(id, email, password, email_verified, verification_token, token_expires_at) |
 | Email capability | No transactional email | SendGrid integrated with HTML template |
+| **Architecture** | | |
+| Auth flow | Single-step: register → login | Two-step: register → verify → login |
+| Middleware stack | `requireAuth` only | `requireAuth` + `requireVerified` chain |
+| **Data Model** | | |
+| User table | users(id, email, password) | users(id, email, password, email_verified, verification_token, token_expires_at) |
 | Test coverage | Basic auth tests only | Unit + integration + e2e for full verify flow |
+
+---
+
+### Gantt Timeline
+
+```mermaid
+gantt
+    title Email Verification Implementation
+    dateFormat  YYYY-MM-DD
+    section Phase 1: Database & Model
+        Add verification columns     :p1a, 2024-01-15, 1d
+        Write unit tests              :p1b, after p1a, 1d
+        Run migration on dev          :p1c, after p1b, 0.5d
+    section Phase 2: Email Service
+        Create sendVerificationEmail  :p2a, after p1c, 1d
+        Integrate into signup flow    :p2b, after p2a, 0.5d
+        Create email template         :p2c, after p2a, 0.5d
+        Write integration tests       :p2d, after p2b, 1d
+    section Phase 3: Verify Endpoint
+        Create /verify endpoint       :p3a, after p2d, 1d
+        Add requireVerified middleware:p3b, after p3a, 1d
+        Apply middleware to routes    :p3c, after p3b, 0.5d
+        Write unit + e2e tests        :p3d, after p3c, 1.5d
+```
+
+---
+
+### Risk Summary
+
+| Risk | Impact | Likelihood | Mitigation |
+|------|--------|------------|------------|
+| Migration locks large user table in production | High -- downtime | Low (PostgreSQL 11+ non-blocking) | Run on staging first with production-size dataset |
+| SendGrid rate limits delay verification emails | Medium -- poor UX | Medium (high signup volume) | Implement email queue with retry logic; configure rate limit alerts |
+| Users don't check email, accounts stuck unverified | Low -- feature unused | High | Follow-up: "Resend verification" feature; monitor verification completion rate |
 
 ---
 
@@ -491,6 +651,31 @@ flowchart LR
 
 ### Todos
 1. [ ] [Phase 1] Add `email_verified` boolean column (default: false) and `verification_token` string column to User table via migration `20240115_add_email_verification.sql` (id: phase-1-1, Owner: Dev, Effort: 1h, Priority: P1, Type: impl)
+
+   #### Logic (Dev View)
+
+   ```pseudo
+   GIVEN User table exists with columns (id, email, password)
+   WHEN migration 20240115_add_email_verification.sql is executed
+   THEN add column email_verified BOOLEAN DEFAULT false NOT NULL
+     → add column verification_token VARCHAR(64) UNIQUE
+     → add column token_expires_at TIMESTAMP
+     → add index on verification_token for fast lookup
+   ```
+
+   #### Why This Approach
+   **Decision:** Use additive-only migration with non-blocking ALTER TABLE.
+   **Alternatives Considered:**
+   - Create separate verification table -- rejected: adds JOIN complexity for a simple boolean check
+   - Use JSON column for verification metadata -- rejected: loses database-level constraints and indexing
+   **Reasoning (Risk-based):**
+   - Production user table may be large (100k+ rows)
+   - Non-blocking ALTER TABLE ADD COLUMN is safe in PostgreSQL 11+
+   - Additive migration means zero risk of data loss
+   - Conclusion: Simple column additions are safest and sufficient
+   **Trade-off:** Slightly wider User table (3 new columns) vs separate table with JOINs
+   **Lesson Learned:** Prefer additive migrations over destructive ones; always verify non-blocking behavior for the target database version.
+
 2. [ ] [Phase 1] Add `token_expires_at` timestamp column to User table in same migration (id: phase-1-2, Owner: Dev, Effort: 0.5h, Priority: P1, Type: impl)
 3. [ ] [Phase 1] Write unit tests: verify default values, verify token generation produces unique 32-char hex strings, verify expiry is set to 24h from creation (id: phase-1-3, Owner: Dev, Effort: 1.5h, Priority: P1, Type: test)
 4. [ ] [Phase 1] Run migration on dev database and confirm schema matches spec (id: phase-1-4, Owner: Dev, Effort: 0.5h, Priority: P1, Type: ops)
@@ -501,6 +686,14 @@ flowchart LR
 - AC3: `token_expires_at` is set to exactly 24 hours after token creation
 - AC4: Existing users are unaffected (migration is additive only)
 
+#### Test Map
+| AC | Test Todo | Verification Method |
+|----|-----------|---------------------|
+| AC1: email_verified defaults to false | phase-1-3 (default values test) | Unit test |
+| AC2: Token is unique 32-char hex | phase-1-3 (token generation test) | Unit test |
+| AC3: Token expires at 24h | phase-1-3 (expiry test) | Unit test |
+| AC4: Existing users unaffected | phase-1-4 (migration verification) | Manual |
+
 ### Risks & Assumptions
 - Risk: Migration on production with large user table may lock table → Mitigation: Run migration on staging first with production-size dataset; use `ALTER TABLE ... ADD COLUMN` which is non-blocking in PostgreSQL 11+
 - Assumption: No other pending migrations conflict with User table changes
@@ -509,6 +702,32 @@ flowchart LR
 - Tests: Unit tests for model defaults and token generation
 - Static checks: Lint, type check pass
 - Manual verification: Inspect dev database schema after migration
+
+#### Agent Handoff Notes
+- **Entry point:** `migrations/` directory -- create new file `20240115_add_email_verification.sql`
+- **Prerequisite state:** Dev database is accessible and current migration state is clean
+- **Key files to read first:** `src/models/user.ts` (existing User model), `migrations/` (existing migration patterns)
+- **Gotchas:** Ensure column defaults are set in migration AND in ORM model definition; check if any existing queries use `SELECT *` that would break with new columns
+
+#### What You'll Learn From This Phase
+- **Pattern:** Additive migration -- extending schemas without breaking existing functionality
+- **Principle:** Open/Closed Principle -- existing behavior is unchanged while new capability is added
+- **Skill:** Database migration safety practices for production environments
+
+#### Phase Flow
+
+```mermaid
+flowchart TD
+    A["Read existing User model"] --> B["Create migration SQL"]
+    B --> C["Add email_verified column"]
+    B --> D["Add verification_token column"]
+    B --> E["Add token_expires_at column"]
+    C --> F["Run migration on dev"]
+    D --> F
+    E --> F
+    F --> G["Verify schema matches spec"]
+    G --> H["Run unit tests"]
+```
 
 ### Stop Condition
 - Migration runs successfully on dev, all 3 unit tests pass, existing auth tests still pass
@@ -529,34 +748,29 @@ flowchart LR
    #### Logic (Dev View)
 
    ```pseudo
-   FUNCTION sendVerificationEmail(userId):
-     VALIDATE userId exists in database
-     LOAD user record from DB
-
-     GENERATE token = crypto.randomBytes(16).toString('hex')  // 32 chars
-     CALCULATE expiry = NOW() + 24 hours
-
-     PERSIST token and expiry to user record
-
-     BUILD email HTML from template with verify link
-     EMIT SendGrid API call with email payload
-
-     IF SendGrid fails THEN
-       LOG error with userId and retry context
-       THROW EmailDeliveryError
-     END IF
-
-     RETURN success
-   END FUNCTION
+   GIVEN a newly registered user with userId
+   WHEN sendVerificationEmail(userId) is called
+   THEN validate userId exists in database
+     → generate token = crypto.randomBytes(16).toString('hex')
+     → calculate expiry = NOW() + 24 hours
+     → persist token and expiry to user record
+     → build email HTML from template with verify link
+     → send via SendGrid API
+     → IF SendGrid fails THEN log error, throw EmailDeliveryError
+     → return success
    ```
 
    #### Why This Approach
    **Decision:** Use random hex token instead of JWT for verification link.
+   **Alternatives Considered:**
+   - JWT token -- rejected: stateless multi-use design is overkill for single-use verification; adds decode overhead
+   - UUID v4 -- rejected: longer than needed; hex token is simpler and equally secure
    **Reasoning (Comparative):**
    - Random token: single-use, server-stored, simple generation, no decode overhead
    - JWT: multi-use, stateless, heavier, overkill for one-time verification
    - Conclusion: Random hex is simpler and sufficient for single-use verification
    **Trade-off:** Requires DB lookup per verification (acceptable -- happens once per user)
+   **Lesson Learned:** For one-time-use tokens, prefer simple random generation over structured tokens (JWT/PASETO); the simpler approach reduces attack surface and implementation complexity.
 
 2. [ ] [Phase 2] Integrate `sendVerificationEmail` call into existing signup controller `src/controllers/auth.ts#register`, called after successful user creation (id: phase-2-2, Owner: Dev, Effort: 1h, Priority: P1, Type: impl)
 3. [ ] [Phase 2] Create email HTML template `templates/verify-email.html` with verification button linking to `/verify?token={token}` (id: phase-2-3, Owner: Dev, Effort: 1h, Priority: P2, Type: impl)
@@ -569,6 +783,14 @@ flowchart LR
 - AC3: Existing signup flow still works with no regression
 - AC4: Duplicate email registration returns 409 without sending verification email
 
+#### Test Map
+| AC | Test Todo | Verification Method |
+|----|-----------|---------------------|
+| AC1: Email sends within 5s | phase-2-4 (integration: timing assertion) | Integration test |
+| AC2: Email contains valid verify link | phase-2-4 (integration: email content check) | Integration test |
+| AC3: No regression in signup | phase-2-4 (integration: existing flow) | Integration test |
+| AC4: Duplicate email returns 409 | phase-2-5 (edge case: duplicate) | Integration test |
+
 ### Risks & Assumptions
 - Risk: SendGrid rate limits could delay emails under high signup volume → Mitigation: Implement email queue with retry logic; configure SendGrid rate limit alerts in monitoring dashboard
 - Assumption: SendGrid API key is already in environment config
@@ -577,6 +799,12 @@ flowchart LR
 - Tests: Integration tests with SendGrid mock, edge case for duplicate emails
 - Static checks: Lint, type check
 - Manual verification: Register test account, confirm email arrives with correct link
+
+#### Agent Handoff Notes
+- **Entry point:** `src/services/` directory -- create new file `email.ts` for sendVerificationEmail
+- **Prerequisite state:** Phase 1 complete -- User model has verification columns; migration applied to dev
+- **Key files to read first:** `src/controllers/auth.ts` (signup flow to integrate into), `src/config/env.ts` (SendGrid API key config)
+- **Gotchas:** SendGrid mock must be configured in test setup; ensure email sending is async and doesn't block the signup response
 
 #### What You'll Learn From This Phase
 - **Pattern:** Service extraction -- isolating email logic from controller
@@ -615,6 +843,34 @@ sequenceDiagram
 
 ### Todos
 1. [ ] [Phase 3] Create `GET /verify?token={token}` endpoint in `src/routes/auth.ts`: validate token exists and is not expired, set `email_verified=true`, delete used token (id: phase-3-1, Owner: Dev, Effort: 2h, Priority: P1, Type: impl)
+
+   #### Logic (Dev View)
+
+   ```pseudo
+   GIVEN a verification request with token parameter
+   WHEN GET /verify?token={token} is called
+   THEN validate token is non-empty string
+     → lookup user by verification_token (timing-safe comparison)
+     → IF token not found THEN return 404 TOKEN_NOT_FOUND
+     → IF token_expires_at < NOW() THEN return 400 TOKEN_EXPIRED
+     → set email_verified = true
+     → clear verification_token and token_expires_at
+     → return 200 with redirect to /dashboard
+   ```
+
+   #### Why This Approach
+   **Decision:** Delete token after successful verification (single-use) with idempotent re-verification.
+   **Alternatives Considered:**
+   - Keep token after use (reusable link) -- rejected: security risk if link is leaked; single-use is safer
+   - Invalidate but don't delete -- rejected: unnecessary data retention; GDPR-friendly to delete
+   **Reasoning (Risk-based):**
+   - Single-use tokens minimize exposure window
+   - Deleting used tokens reduces data stored and simplifies queries
+   - Idempotent: already-verified users clicking again get 200 (not error)
+   - Conclusion: Delete-after-use is most secure and simplest
+   **Trade-off:** Users must request new token if link expires (acceptable with "Resend" follow-up feature)
+   **Lesson Learned:** Single-use security tokens should be deleted, not just invalidated; this prevents accumulation and removes potential attack vectors from stored tokens.
+
 2. [ ] [Phase 3] Add `requireVerified` middleware in `src/middleware/auth.ts` that returns 403 with body `{error: "EMAIL_NOT_VERIFIED", message: "Please verify your email"}` for unverified users (id: phase-3-2, Owner: Dev, Effort: 1.5h, Priority: P1, Type: impl)
 3. [ ] [Phase 3] Apply `requireVerified` middleware to routes: `/dashboard`, `/settings`, `/api/projects/*` in `src/routes/index.ts` (id: phase-3-3, Owner: Dev, Effort: 1h, Priority: P1, Type: impl)
 4. [ ] [Phase 3] Write unit tests for `/verify` endpoint: valid token -> 200 + verified, expired token -> 400 `TOKEN_EXPIRED`, invalid token -> 404, already-verified user -> 200 idempotent (id: phase-3-4, Owner: Dev, Effort: 2h, Priority: P1, Type: test)
@@ -649,6 +905,32 @@ sequenceDiagram
 - **Key files to read first:** `src/middleware/auth.ts` (existing auth patterns), `src/routes/index.ts` (route registration)
 - **Gotchas:** Token comparison must be timing-safe (use `crypto.timingSafeEqual`) to prevent timing attacks
 
+#### What You'll Learn From This Phase
+- **Pattern:** Middleware chaining -- composing auth checks as reusable middleware layers
+- **Principle:** Defense in Depth -- multiple layers of access control (auth + verification)
+- **Skill:** Timing-safe token comparison to prevent side-channel attacks
+
+#### Phase Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant API as VerifyAPI
+    participant MW as requireVerified
+    participant DB as Database
+
+    U->>API: GET /verify?token=abc123
+    API->>DB: Lookup user by token (timing-safe)
+    DB-->>API: User found, token valid
+    API->>DB: Set email_verified=true, clear token
+    API-->>U: 200 + redirect to /dashboard
+
+    U->>MW: GET /dashboard
+    MW->>DB: Check email_verified
+    DB-->>MW: verified=true
+    MW-->>U: 200 Dashboard content
+```
+
 ### Stop Condition
 - All unit + e2e tests pass, manual walkthrough succeeds, no regressions in existing auth tests, security scan clean
 
@@ -679,11 +961,15 @@ sequenceDiagram
 
 **Why this example works** -- notice these patterns the AI should replicate:
 
+- **All features in all phases**: Every phase has Logic (GIVEN/WHEN/THEN), Reasoning (with Lesson Learned), Learning Notes, Phase Flow diagram, Test Map, and Agent Handoff Notes
 - Every todo names specific files (`src/controllers/auth.ts#register`), functions (`sendVerificationEmail`), and values (`32-char hex`, `24h expiry`)
 - Test todos describe exact test cases, not just "add tests"
 - Each phase has a clear dependency chain: DB model -> email service -> endpoint
+- PM View includes Gantt Timeline and Risk Summary with Impact/Likelihood/Mitigation columns
+- Before/After covers 3 mandatory aspects: Capability, Architecture, Data Model
 - Risks are real and actionable, not generic ("migration may lock table" vs "something might go wrong")
 - Every Risk has a paired `→ Mitigation:` action that describes how to address the risk
+- Every Reasoning block includes a **Lesson Learned** for reusable insight
 - Stop conditions are verifiable, not subjective ("all 3 unit tests pass" vs "code works correctly")
 - Phase Completion Signal provides a machine-readable done-state for each phase
 - Tracker includes `dep_type` column distinguishing `blocks` (must complete first) from `informs` (helpful context) and `enables` (creates capability used later)
@@ -707,38 +993,21 @@ Study these examples to avoid common quality failures. Never produce output matc
 
 ### Step 5d: Dual-View Output Guidelines
 
-The v7 Dual-View architecture separates plan output into two perspectives:
+The Dual-View architecture separates plan output into two perspectives. Both views are **MANDATORY for all plans** regardless of complexity.
 
 **PM View (Macro / Black-Box):**
-- **What**: Executive Summary, Dependency Graph, Before/After Overview
+- **What**: Executive Summary, Dependency Graph, Before/After Overview (3 aspects), Gantt Timeline, Risk Summary
 - **Purpose**: See big picture at a glance without diving into implementation details
 - **Audience**: Product managers, stakeholders, high-level reviewers
 - **Output style**: Tables, diagrams, summaries -- no pseudocode or internals
 
 **Dev View (Micro / White-Box):**
-- **What**: Logic blocks, Reasoning blocks, Learning Notes, Phase Flow diagrams, Test Maps, Agent Handoff Notes
+- **What**: Logic blocks (GIVEN/WHEN/THEN), Reasoning blocks (with Lesson Learned), Learning Notes, Phase Flow diagrams, Test Maps, Agent Handoff Notes
 - **Purpose**: Understand WHY decisions were made, WHAT logic is used, HOW to execute
 - **Audience**: Developers, coding agents, learners
 - **Output style**: Pseudocode, reasoning frameworks, technical details, execution context
 
-**View Activation by Complexity:**
-
-| Complexity | PM View | Dev View |
-|------------|---------|----------|
-| **Lightweight** | Concise PM View: Exec Summary + Before/After required; Dependency Graph optional (3+ phases or non-linear deps) | Off by default; optional deep-dive on 1 critical phase when user explicitly requests |
-| **Standard** | Full PM View (all 3 sections) | Selective -- Dev View for **critical phases only** (see "critical phase" heuristic in Step 2c) |
-| **Complex** | Full PM View (all 3 sections) | Full Dev View on **every phase** (all 6 optional blocks) |
-
-**Output Discipline:**
-- Lightweight plans: Keep concise. No bloat. PM View tells the story, Dev View only if explicitly requested or critical.
-- Standard plans: Balance. PM View always. Dev View for phases with high effort, external deps, or blocking dependencies.
-- Complex plans: Comprehensive. Full PM View + full Dev View. Education and agent-readiness are priorities.
-
-**When in doubt**:
-- If the phase has `Effort >= 2h` OR external service dependencies OR blocks other phases → include Dev View
-- If the user asks "why this approach?" → include Reasoning block
-- If a coding agent will execute → include Agent Handoff Notes
-- If the plan is for learning → include Learning Notes
+**v8 Engineer Mode:** Both PM View and Dev View are MANDATORY for all plans. PM View provides the macro overview with Gantt Timeline and Risk Summary. Dev View provides reasoning, pseudocode, learning, and visualization for every phase. No complexity-based gating.
 
 ### Step 6: Add Tracker View (Required)
 
@@ -782,9 +1051,9 @@ If `Phase 0` exists, Phase 0 is the first active phase.
 
 Before presenting the plan, run FOUR verification passes:
 
-**Pass 1: Structural completeness + v7 Feature Validation**
+**Pass 1: Structural Completeness + v8 Mandatory Feature Validation**
 
-Existing v6 checks:
+Core structural checks:
 - [ ] Spec gate passed or Phase 0 was included
 - [ ] Every todo is traceable to requirements/spec
 - [ ] Every phase has Acceptance Criteria and Stop Condition
@@ -795,34 +1064,32 @@ Existing v6 checks:
 - [ ] TodoWrite items were created with correct ID/status format
 - [ ] Every Risk has a `→ Mitigation:` action (no orphan risks)
 
-NEW v7 checks (PM View - Tier 1):
-- [ ] **Executive Summary present**: If complexity is Lightweight/Standard/Complex, Executive Summary table exists with all 7 metrics
+PM View checks (MANDATORY for all plans):
+- [ ] **Executive Summary present**: Table exists with all 7 metrics (phases, todos, effort, critical path, risk level, key decision, complexity)
 - [ ] **Executive Summary accuracy**: Total phases/todos counts match actual phase sections and Tracker View rows
-- [ ] **Dependency Graph validation**: If present, graph has exactly 1 node per phase (no phantoms, no missing); node IDs match P1, P2, ... PN
+- [ ] **Dependency Graph present**: Mermaid flowchart with exactly 1 node per phase; node IDs match P1, P2, ... PN
 - [ ] **Dependency Graph structure**: All edges represent real dependencies from Tracker View `depends_on` column; no circular dependencies
-- [ ] **Before/After completeness**: Every key capability from Spec Trace appears in Before/After table; no generic rows
+- [ ] **Before/After covers 3 aspects**: Capability + Architecture + Data Model sections all present in Before/After table
 - [ ] **Before/After traceability**: After column describes outcomes from final phase; Before column matches assumptions
+- [ ] **Gantt Timeline present**: Mermaid gantt chart showing all phases with dependencies and effort
+- [ ] **Risk Summary present**: Table with Risk, Impact, Likelihood, Mitigation columns
 
-NEW v7 checks (Dev View - Tier 2):
-- [ ] **Pseudocode presence**: For todos with Effort >= 2h AND Type: impl, Logic (Dev View) block present per complexity rules
-- [ ] **Pseudocode template usage**: Every pseudocode block uses one of 4 templates (Service/Transform/Aggregation/Error handling)
+Dev View checks (MANDATORY for all plans -- every phase):
+- [ ] **Every phase has GIVEN/WHEN/THEN pseudocode**: Logic (Dev View) block present in every phase
+- [ ] **Pseudocode uses GIVEN/WHEN/THEN format**: Every pseudocode block uses one of 4 templates (Service Flow / User Interaction / Data Transform / Error Handling)
 - [ ] **Pseudocode length**: Each Logic block max 15 lines
-- [ ] **Reasoning block presence**: For key decisions (in Executive Summary), Why This Approach block present
+- [ ] **Every phase has Reasoning block with Lesson Learned**: Why This Approach block present with Decision + Alternatives Considered + Reasoning + Trade-off + Lesson Learned
 - [ ] **Reasoning framework**: Every reasoning block picks exactly one framework (Deductive/Comparative/Causal/Risk-based)
-- [ ] **Reasoning completeness**: Decision + Reasoning + Trade-off all present; no "TBD"
-
-NEW v7 checks (Learning - Tier 3):
-- [ ] **Learning Notes presence**: For Complex plans, phases with 5+ todos or Effort >= 8h have What You'll Learn
-- [ ] **Learning Notes structure**: Pattern + Principle + Skill present (Thinking mode optional)
-- [ ] **Phase Flow presence**: For Complex plans, phases with 5+ todos OR multi-component interaction have mermaid diagram
-- [ ] **Phase Flow type**: Uses sequenceDiagram for data flow OR flowchart TD for logic; no generic diagrams
+- [ ] **Every phase has at least 1 mermaid diagram**: Phase Flow block present with appropriate diagram type
+- [ ] **Phase Flow type**: Uses sequenceDiagram, flowchart TD, stateDiagram-v2, or other appropriate type; no generic diagrams
 - [ ] **Phase Flow length**: Each diagram max 15 lines
+- [ ] **Every phase has Learning Notes**: What You'll Learn block with Pattern + Principle + Skill present
 
-NEW v7 checks (Dev+Agent - Tier 2b):
-- [ ] **Test Map presence**: Phases with Type: test todos have Test Map table
+Test + Agent checks (MANDATORY for applicable phases):
+- [ ] **Test Map present**: Every phase with Type: test todos has Test Map table
 - [ ] **Test Map completeness**: Every AC in Acceptance Criteria appears in Test Map; every test todo appears in Test Map
 - [ ] **Test Map no orphans**: No orphan ACs (AC without test), no orphan tests (test without AC)
-- [ ] **Agent Handoff presence**: For phases with Type: impl AND Effort >= 4h, Agent Handoff Notes present per complexity
+- [ ] **Agent Handoff present**: Every phase with impl todos has Agent Handoff Notes
 - [ ] **Agent Handoff completeness**: Entry point + Prerequisite state + Key files + Gotchas all present
 - [ ] **Agent Handoff specificity**: Entry point references actual file/function; Gotchas describe non-obvious constraints
 
@@ -941,14 +1208,14 @@ Plans do not always move forward linearly. When issues are discovered during exe
 ## Metadata
 
 **Command**: `/phase-plan`
-**Version**: 7.0.0
+**Version**: 8.0.0
 **Language**: English
 **Target Platform**: Claude (Anthropic) -- optimized with XML tags and Chain-of-Thought reasoning
 **Dependencies**: TodoWrite tool (required)
 **Mode**: Planning/specification output only
 **TCREI Optimization**: v4.0 -- Context (audience + quality bar), References (gold standard example + anti-patterns), Evaluate (4-point specificity test), Iterate (diagnostic guide)
 **Lyra Optimization**: v5.0 -- Chain-of-Thought reasoning directive, Input Extraction Protocol, Complexity Classifier, Chain-of-Verification (4-pass self-check), Claude-specific XML structure
-**Dual-View Architecture**: v7.0 -- PM View (Executive Summary, Dependency Graph, Before/After) + Dev View (Logic, Reasoning, Learning, Flow, Test Map, Handoff)
+**Engineer Mode Architecture**: v8.0 -- All features mandatory. PM View (Executive Summary, Dependency Graph, Before/After, Gantt Timeline, Risk Summary) + Dev View (Logic GIVEN/WHEN/THEN, Reasoning with Lesson Learned, Learning, Flow, Test Map, Handoff)
 
 ### Changelog v6.0
 
@@ -1013,6 +1280,44 @@ Plans do not always move forward linearly. When issues are discovered during exe
 - **Agent-Ready**: Agent Handoff Notes bridge plan↔execution context gap
 - **Test Traceability**: Test Map ensures bidirectional AC↔Test mapping
 - **Learning-Focused**: Learning Notes explain patterns/principles/skills
+
+### Changelog v8.0
+
+| Change | Source |
+|--------|--------|
+| **"Engineer Mode": All features mandatory regardless of complexity** | Phase Plan v8 Enhancement Plan |
+| Removed complexity-based feature gating (Feature Activation Matrix rewritten) | Phase Plan v8 Enhancement Plan |
+| Removed all OPTIONAL and Tier labels from block definitions | Phase Plan v8 Enhancement Plan |
+| Changed pseudocode format from code-like to GIVEN/WHEN/THEN with 4 templates (Service Flow, User Interaction, Data Transform, Error Handling) | Phase Plan v8 Enhancement Plan |
+| Added "Lesson Learned" field to Reasoning block (Why This Approach) | Phase Plan v8 Enhancement Plan |
+| Added "Alternatives Considered" field to Reasoning block | Phase Plan v8 Enhancement Plan |
+| Added Gantt Timeline (mermaid gantt) to PM View Output Contract | Phase Plan v8 Enhancement Plan |
+| Added Risk Summary table (Risk, Impact, Likelihood, Mitigation) to PM View Output Contract | Phase Plan v8 Enhancement Plan |
+| Enhanced Before/After Overview to require 3 aspects: Capability + Architecture + Data Model | Phase Plan v8 Enhancement Plan |
+| Added Table of Contents with anchor links | Phase Plan v8 Enhancement Plan |
+| Added Quick Start (TL;DR) section with mermaid process overview | Phase Plan v8 Enhancement Plan |
+| Added When to Use / When to Skip triage checklist | Phase Plan v8 Enhancement Plan |
+| Enhanced Gold Standard Example: all features in all 3 phases (not selective) | Phase Plan v8 Enhancement Plan |
+| Simplified Self-Check Pass 1: removed tier-gated checks, added mandatory feature checks | Phase Plan v8 Enhancement Plan |
+| Simplified Dual-View Guidelines: removed complexity gating language | Phase Plan v8 Enhancement Plan |
+| Step 2b repurposed: complexity classification for effort estimation only, not feature gating | Phase Plan v8 Enhancement Plan |
+| Updated title to "Phase Plan v8.0 -- Engineer Mode" | Phase Plan v8 Enhancement Plan |
+
+**Migration from v7 to v8:**
+- All v7 plans remain structurally valid
+- v8 removes feature gating: complexity classification no longer determines which features appear
+- All plans now include full PM View (with Gantt + Risk Summary) and full Dev View (all phases)
+- Pseudocode format changed from code-like to GIVEN/WHEN/THEN (BDD-style)
+- Reasoning block now requires "Lesson Learned" and "Alternatives Considered" fields
+- No backward-incompatible structural changes to phase format
+- File size increased ~280 lines (v7: ~1020 lines → v8: ~1300 lines, +27%)
+
+**Design Principles v8:**
+- **Full Transparency**: Every plan exposes reasoning, pseudocode, and learning -- no hidden decisions
+- **Visualization Over Text**: Minimum 2 mermaid diagrams per plan, 1 per phase
+- **Learning by Default**: Learning Notes in every phase teach patterns, principles, and skills
+- **No Feature Gating**: All features are mandatory; complexity only affects phase count and effort
+- **Dual-View Separation**: PM View (macro) + Dev View (micro) -- both always present
 
 ## Related Commands
 
